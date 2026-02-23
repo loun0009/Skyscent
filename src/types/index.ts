@@ -1,0 +1,31 @@
+// Données météo retournées par OpenWeatherMap
+export interface WeatherData {
+    temperature: number;
+    feelsLike: number;
+    condition: string;
+    description: string;
+    humidity: number;
+    city: string;
+    icon: string;
+}
+
+// Données de parfum 
+export interface Perfume {
+    id: number;
+    name: string;
+    brand: string;
+    season: Season[];
+    temperatureRange: {
+        min :number;
+        max: number;
+    };
+    weatherConditions: string[];
+    notes: string[];
+    intensity: 'light' | 'moderate' | 'strong';
+    gender: "male" | "female" | "unisex";
+    description: string;
+    image_url: string;
+}
+
+// Saisons de l'année
+export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
