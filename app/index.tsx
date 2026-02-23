@@ -1,9 +1,11 @@
-import {View, Text, ScrollView, ActivityIndicator, StyleSheet, StatusBar,TouchableOpacity,} from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useWeather } from "../src/hooks/useWeather";
 import { usePerfumes } from "../src/hooks/usePerfumes";
 import { WeatherCard } from "../src/components/weatherCard";
 import { PerfumeCard } from "../src/components/perfumeCard";
+import { LoadingScreen } from "../src/components/LoadingScreen";
+import { ErrorMessage } from "../src/components/errorBoundary";
 import { Perfume } from "../src/types";
 
 export default function HomeScreen() {
@@ -16,61 +18,84 @@ export default function HomeScreen() {
   };
 
   if (weatherLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#6B4EFF" />
-        <Text style={styles.loadingText}>Détection de votre position...</Text>
-      </View>
-    );
+    return <LoadingScreen message="Détection de votre position..." />;
   }
 
   if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={refresh}>
-          <Text style={styles.retryText}>Réessayer</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    return <ErrorMessage message={error} onRetry={refresh} />;
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <StatusBar barStyle="dark-content" />
+    <View style={styles.wrapper}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f8f8fc" />
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        <Text style={styles.headline}>Votre parfum du jour</Text>
 
-      <Text style={styles.headline}>Votre parfum du jour</Text>
+        {weather && <WeatherCard weather={weather} />}
 
-      {weather && <WeatherCard weather={weather} />}
+        <Text style={styles.sectionTitle}>
+          {recommendations.length > 0
+            ? `${recommendations.length} parfums recommandés 🌸`
+            : "Aucun parfum trouvé pour cette météo 😔"}
+        </Text>
 
-      <Text style={styles.sectionTitle}>
-        {recommendations.length > 0
-          ? `${recommendations.length} parfums recommandés 🌸`
-          : "Aucun parfum trouvé pour cette météo"}
-      </Text>
+        {perfumesLoading ? (
+          <LoadingScreen message="Analyse des parfums..." />
+        ) : (
+          recommendations.map((perfume) => (
+            <PerfumeCard
+              key={perfume.id}
+              perfume={perfume}
+              onPress={handlePerfumePress}
+            />
+          ))
+        )}
 
-      {perfumesLoading ? (
-        <ActivityIndicator color="#6B4EFF" />
-      ) : (
-        recommendations.map((perfume) => (
-          <PerfumeCard
-            key={perfume.id}
-            perfume={perfume}
-            onPress={handlePerfumePress}
-          />
-        ))
-      )}
-    </ScrollView>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Mis à jour à {new Date().toLocaleTimeString("fr-FR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+          <TouchableOpacity onPress={refresh}>
+            <Text style={styles.refreshText}>↻ Actualiser</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  container: { flex: 1, backgroundColor: "#f8f8fc", padding: 20, paddingTop: 60 },
-  headline: { fontSize: 28, fontWeight: "bold", color: "#1a1a2e", marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: "600", color: "#1a1a2e", marginBottom: 16 },
-  loadingText: { marginTop: 12, color: "#666" },
-  errorText: { color: "red", textAlign: "center", marginBottom: 16 },
-  retryButton: { backgroundColor: "#6B4EFF", padding: 12, borderRadius: 12 },
-  retryText: { color: "#fff", fontWeight: "600" },
+  wrapper: { flex: 1, backgroundColor: "#f8f8fc" },
+  container: { flex: 1 },
+  content: { padding: 20, paddingTop: 60, paddingBottom: 40 },
+  headline: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#1a1a2e",
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1a1a2e",
+    marginBottom: 16,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  footerText: { fontSize: 12, color: "#aaa" },
+  refreshText: { fontSize: 14, color: "#6B4EFF", fontWeight: "600" },
 });
