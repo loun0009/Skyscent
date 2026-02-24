@@ -15,10 +15,8 @@ export interface Perfume {
     name: string;
     brand: string;
     season: Season[];
-    temperatureRange: {
-        min :number;
-        max: number;
-    };
+    temp_min: number;
+    temp_max: number;
     weatherConditions: string[];
     notes: string[];
     intensity: 'légère' | 'modérée' | 'intense';

@@ -1,27 +1,43 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Perfume, WeatherData } from "../types";
+import { fetchPerfumes } from "../services/perfumesApi";
 import { getRecommendations } from "../utils/recommendations";
-import perfumesData from "../data/perfumes.json";
 
 interface UsePerfumesReturn {
     perfumes: Perfume[];
     recommendations: Perfume[];
     loading: boolean;
+    error: string | null;
 }
 
 export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
-    const [perfumes] = useState<Perfume[]>(perfumesData as Perfume[]);
-    const [recommendations, setRecommendations] = useState<Perfume[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [perfumes, setPerfumes] = useState<Perfume[]>([]);
+  const [recommendations, setRecommendations] = useState<Perfume[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!weather) return;
+  useEffect(() => {
+    loadPerfumes();
+  }, []);
 
-        setLoading(true);
-        const results = getRecommendations(weather, perfumes);
-        setRecommendations(results);
-        setLoading(false);
-    }, [weather]);
+  useEffect(() => {
+    if (!weather || perfumes.length === 0) return;
+    const results = getRecommendations(weather, perfumes);
+    setRecommendations(results);
+  }, [weather, perfumes]);
 
-    return { perfumes, recommendations, loading };
+  const loadPerfumes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchPerfumes();
+      setPerfumes(data);
+    } catch (e) {
+      setError("Impossible de charger les parfums.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { perfumes, recommendations, loading, error };
 }

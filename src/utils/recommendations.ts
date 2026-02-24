@@ -7,33 +7,33 @@ const getSeason = (temp: number): Season => {
   return "summer";
 };
 
-const normalizeCondition = (condition: string): string => {
-  return condition.toLowerCase();
-};
-
 export const getRecommendations = (
   weather: WeatherData,
   perfumes: Perfume[]
 ): Perfume[] => {
   const season = getSeason(weather.temperature);
-  const condition = normalizeCondition(weather.condition);
+  const condition = weather.condition.toLowerCase();
 
   const scored = perfumes.map((perfume) => {
-
     let score = 0;
 
-    const range = perfume["temperatureRange"]; 
-    if (range && range["min"] !== undefined && range["max"] !== undefined) {
-      if (weather.temperature >= range["min"] && weather.temperature <= range["max"]) {
-        score += 3;
-      }
+    if (
+      perfume.temp_min !== undefined &&
+      perfume.temp_max !== undefined &&
+      weather.temperature >= perfume.temp_min &&
+      weather.temperature <= perfume.temp_max
+    ) {
+      score += 3;
     }
 
     if (Array.isArray(perfume.season) && perfume.season.includes(season)) {
       score += 2;
     }
 
-    if (Array.isArray(perfume.weatherConditions) && perfume.weatherConditions.includes(condition)) {
+    if (
+      Array.isArray(perfume.weatherConditions) &&
+      perfume.weatherConditions.includes(condition)
+    ) {
       score += 1;
     }
 
