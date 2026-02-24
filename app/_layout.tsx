@@ -37,6 +37,15 @@ export default function RootLayout() {
             ),
           }}
         />
+         <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Paramètres",
+            tabBarIcon: ({ color }) => (
+              <Text style={{ fontSize: 20, color }}>⚙️</Text>
+            ),
+          }}
+        />
         <Tabs.Screen
           name="perfume/[id]"
           options={{ href: null }}

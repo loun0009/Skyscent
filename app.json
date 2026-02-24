@@ -21,6 +21,7 @@
         "foregroundImage": "./assets/adaptive-logo.png",
         "backgroundColor": "#6b4eff"
       },
+      "permissions": ["RECEIVE_BOOT_COMPLETED"],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -29,7 +30,15 @@
     },
     "plugins": [
       "expo-font",
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#6b4eff",
+          "sound": []
+        }
+      ]
     ]
   }
 }
