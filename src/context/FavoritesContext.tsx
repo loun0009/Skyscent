@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { getFavorites, toggleFavorite } from "../services/favoritesService";
 import { Perfume } from "../types";
+import { fetchPerfumes } from "../services/perfumesApi";
 import perfumesData from "../data/perfumes.json";
 
 interface FavoritesContextType {
@@ -16,6 +17,7 @@ const FavoritesContext = createContext<FavoritesContextType | null>(null);
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allPerfumes, setAllPerfumes] = useState<Perfume[]>([]);
 
   const loadFavorites = useCallback(async () => {
     const ids = await getFavorites();
@@ -24,7 +26,12 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    loadFavorites();
+    const init = async () => {
+      await loadFavorites();
+      const perfumes = await fetchPerfumes();
+      setAllPerfumes(perfumes);
+    };
+    init();
   }, []);
 
   const toggle = async (id: number) => {
@@ -36,8 +43,8 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
   const isFavorite = (id: number) => favoriteIds.includes(id);
 
-  const favoritePerfumes = (perfumesData as Perfume[]).filter((p) =>
-    favoriteIds.includes(p.id)
+  const favoritePerfumes = allPerfumes.filter((p) =>
+  favoriteIds.includes(p.id)
   );
 
   return (
