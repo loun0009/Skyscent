@@ -1,17 +1,26 @@
-import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from "react-native";
+import {
+  View, Text, ScrollView, StyleSheet,
+  StatusBar, TouchableOpacity
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useWeather } from "../src/hooks/useWeather";
 import { usePerfumes } from "../src/hooks/usePerfumes";
+import { useFilters } from "../src/hooks/useFilters";
 import { WeatherCard } from "../src/components/weatherCard";
 import { PerfumeCard } from "../src/components/perfumeCard";
-import { LoadingScreen } from "../src/components/LoadingScreen";
+import { FilterBar } from "../src/components/filterBar";
+import { LoadingScreen } from "../src/components/loadingScreen";
 import { ErrorMessage } from "../src/components/errorBoundary";
 import { Perfume } from "../src/types";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { weather, loading: weatherLoading, error, refresh } = useWeather();
-  const { recommendations, loading: perfumesLoading } = usePerfumes(weather);
+  const { recommendations, perfumes, loading: perfumesLoading } = usePerfumes(weather);
+  const { filters, setGender, setIntensity, setBrand, resetFilters, applyFilters, activeCount } = useFilters();
+
+  // On applique les filtres sur les recommandations
+  const filteredRecommendations = applyFilters(recommendations);
 
   const handlePerfumePress = (perfume: Perfume) => {
     router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } });
@@ -37,16 +46,27 @@ export default function HomeScreen() {
 
         {weather && <WeatherCard weather={weather} />}
 
+        {/* Barre de filtres */}
+        <FilterBar
+          filters={filters}
+          perfumes={perfumes}
+          activeCount={activeCount}
+          onGenderChange={setGender}
+          onIntensityChange={setIntensity}
+          onBrandChange={setBrand}
+          onReset={resetFilters}
+        />
+
         <Text style={styles.sectionTitle}>
-          {recommendations.length > 0
-            ? `${recommendations.length} parfums recommandés 🌸`
-            : "Aucun parfum trouvé pour cette météo 😔"}
+          {filteredRecommendations.length > 0
+            ? `${filteredRecommendations.length} parfum${filteredRecommendations.length > 1 ? "s" : ""} recommandé${filteredRecommendations.length > 1 ? "s" : ""} 🌸`
+            : "Aucun parfum pour ces filtres 😔"}
         </Text>
 
         {perfumesLoading ? (
           <LoadingScreen message="Analyse des parfums..." />
         ) : (
-          recommendations.map((perfume) => (
+          filteredRecommendations.map((perfume) => (
             <PerfumeCard
               key={perfume.id}
               perfume={perfume}
@@ -75,18 +95,8 @@ const styles = StyleSheet.create({
   wrapper: { flex: 1, backgroundColor: "#f8f8fc" },
   container: { flex: 1 },
   content: { padding: 20, paddingTop: 60, paddingBottom: 40 },
-  headline: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1a1a2e",
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1a1a2e",
-    marginBottom: 16,
-  },
+  headline: { fontSize: 28, fontWeight: "bold", color: "#1a1a2e", marginBottom: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: "600", color: "#1a1a2e", marginBottom: 16 },
   footer: {
     flexDirection: "row",
     justifyContent: "space-between",
