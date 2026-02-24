@@ -1,7 +1,4 @@
-import {
-  View, Text, ScrollView, StyleSheet,
-  StatusBar, TouchableOpacity
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useWeather } from "../src/hooks/useWeather";
 import { usePerfumes } from "../src/hooks/usePerfumes";
@@ -12,12 +9,14 @@ import { FilterBar } from "../src/components/filterBar";
 import { LoadingScreen } from "../src/components/loadingScreen";
 import { ErrorMessage } from "../src/components/errorBoundary";
 import { Perfume } from "../src/types";
+import { useFavorites } from "../src/context/FavoritesContext";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { weather, loading: weatherLoading, error, refresh } = useWeather();
   const { recommendations, perfumes, loading: perfumesLoading } = usePerfumes(weather);
   const { filters, setGender, setIntensity, setBrand, resetFilters, applyFilters, activeCount } = useFilters();
+  const { isFavorite, toggle } = useFavorites();
 
   // On applique les filtres sur les recommandations
   const filteredRecommendations = applyFilters(recommendations);
@@ -71,6 +70,8 @@ export default function HomeScreen() {
               key={perfume.id}
               perfume={perfume}
               onPress={handlePerfumePress}
+              isFavorite={isFavorite(perfume.id)}
+              onToggleFavorite={toggle}
             />
           ))
         )}
