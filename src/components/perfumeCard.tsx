@@ -4,15 +4,17 @@ import { Perfume } from "../types";
 interface Props {
     perfume: Perfume;
     onPress: (perfume: Perfume) => void;
+    isFavorite?: boolean;
+    onToggleFavorite?: (id: number) => void;
 }
 
 const intensityColors = {
-    "light": "#a8e6cf",
-    "moderate": "#ffd3a5",
-    "strong": "#fd9853"
+    "légère": "#a8e6cf",
+    "modérée": "#ffd3a5",
+    "intense": "#fd9853"
 };
 
-export const PerfumeCard= ({ perfume, onPress }: Props) => {
+export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite }: Props) => {
     return (
         <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)}>
             <Image source={{ uri: perfume.image_url }} style={styles.image} />
@@ -25,7 +27,12 @@ export const PerfumeCard= ({ perfume, onPress }: Props) => {
                     <View style={[styles.badge, { backgroundColor: intensityColors[perfume.intensity] }]}>
                         <Text style={styles.badgeText}>{perfume.intensity}</Text>
                     </View>
-                </View>
+                  {onToggleFavorite && (
+                    <TouchableOpacity style={styles.heartButton} onPress={() => onToggleFavorite(perfume.id)}>
+                      <Text style={styles.heart}>{isFavorite ? "❤️" : "🤍"}</Text>
+                    </TouchableOpacity>
+                  )}
+              </View>
                 <Text style={styles.description} numberOfLines={2}>
                     {perfume.description}
                 </Text>
@@ -97,5 +104,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#999",
     marginTop: 4,
+  },
+  heartButton: { 
+    padding: 4 
+  },
+  heart: { 
+    fontSize: 16 
   },
 });
