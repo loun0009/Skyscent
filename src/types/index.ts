@@ -21,11 +21,17 @@ export interface Perfume {
     };
     weatherConditions: string[];
     notes: string[];
-    intensity: 'light' | 'moderate' | 'strong';
-    gender: "male" | "female" | "unisex";
+    intensity: 'légère' | 'modérée' | 'intense';
+    gender: "masculin" | "féminin" | "mixte";
     description: string;
     image_url: string;
 }
 
 // Saisons de l'année
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+
+export interface Filters {
+    gender: 'tous' | 'masculin' | 'féminin' | 'mixte';
+    intensity: 'tous' | 'légère' | 'modérée' | 'intense';
+    brand: string;
+}
