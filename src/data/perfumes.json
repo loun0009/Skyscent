@@ -21,7 +21,7 @@
     "weather_conditions": ["snow", "clouds", "rain", "mist"],
     "notes": ["café", "vanille", "jasmin", "patchouli"],
     "intensity": "intense",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Envoûtant et gourmand, idéal pour les soirées hivernales.",
     "image_url": "https://placehold.co/300x300?text=Black+Opium"
   },
@@ -34,7 +34,7 @@
     "weather_conditions": ["clear", "clouds"],
     "notes": ["citron", "gingembre", "cèdre", "santal"],
     "intensity": "modérée",
-    "gender": "homme",
+    "gender": "masculin",
     "description": "Frais et boisé, polyvalent et élégant pour toutes les occasions.",
     "image_url": "https://placehold.co/300x300?text=Bleu+de+Chanel"
   },
@@ -47,7 +47,7 @@
     "weather_conditions": ["clear", "clouds"],
     "notes": ["bergamote", "néroli", "romarin", "musique marine"],
     "intensity": "légère",
-    "gender": "homme",
+    "gender": "masculin",
     "description": "Aquatique et ensoleillé, évoque la Méditerranée en été.",
     "image_url": "https://placehold.co/300x300?text=Acqua+di+Gio"
   },
@@ -60,7 +60,7 @@
     "weather_conditions": ["rain", "clouds", "snow"],
     "notes": ["iris", "patchouli", "praline", "vanille"],
     "intensity": "intense",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Gourmand et floral, un cocon de douceur pour l'hiver.",
     "image_url": "https://placehold.co/300x300?text=La+Vie+est+Belle"
   },
@@ -73,7 +73,7 @@
     "weather_conditions": ["clear", "clouds"],
     "notes": ["pamplemousse", "jasmin", "iris", "musc blanc"],
     "intensity": "légère",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Frais, floral et pétillant, parfait pour le printemps.",
     "image_url": "https://placehold.co/300x300?text=Chance+Eau+Tendre"
   },
@@ -99,7 +99,7 @@
     "weather_conditions": ["clear"],
     "notes": ["citron de Sicile", "pomme", "cèdre", "musc blanc"],
     "intensity": "légère",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Ultra frais et citronné, l'essence de l'été méditerranéen.",
     "image_url": "https://placehold.co/300x300?text=Light+Blue"
   },
@@ -112,7 +112,7 @@
     "weather_conditions": ["clear", "clouds", "rain"],
     "notes": ["bergamote", "poivre de Sichuan", "ambroxan", "cèdre"],
     "intensity": "modérée",
-    "gender": "homme",
+    "gender": "masculin",
     "description": "Frais et épicé à la fois, un classique polyvalent.",
     "image_url": "https://placehold.co/300x300?text=Sauvage"
   },
@@ -125,7 +125,7 @@
     "weather_conditions": ["clouds", "rain", "snow"],
     "notes": ["rose", "jasmin", "patchouli", "vanille"],
     "intensity": "intense",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Une explosion florale enveloppante pour les jours froids.",
     "image_url": "https://placehold.co/300x300?text=Flowerbomb"
   },
@@ -138,7 +138,7 @@
     "weather_conditions": ["clear", "clouds"],
     "notes": ["orange", "pamplemousse", "poivre", "vétiver"],
     "intensity": "modérée",
-    "gender": "homme",
+    "gender": "masculin",
     "description": "Boisé et minéral, idéal pour les mi-saisons.",
     "image_url": "https://placehold.co/300x300?text=Terre+d'Hermes"
   },
@@ -151,7 +151,7 @@
     "weather_conditions": ["clear", "clouds"],
     "notes": ["pivoine", "rose de Grasse", "musc blanc"],
     "intensity": "légère",
-    "gender": "femme",
+    "gender": "féminin",
     "description": "Poudré et floral, léger comme un matin de printemps.",
     "image_url": "https://placehold.co/300x300?text=Miss+Dior"
   },
@@ -190,7 +190,7 @@
     "weather_conditions": ["clear", "clouds", "rain"],
     "notes": ["gingembre", "vétiver", "cèdre", "poivre blanc"],
     "intensity": "modérée",
-    "gender": "homme",
+    "gender": "masculin",
     "description": "Boisé et épicé avec légèreté, parfait pour les mi-saisons.",
     "image_url": "https://placehold.co/300x300?text=L'Homme+YSL"
   }
