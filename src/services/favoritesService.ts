@@ -1,49 +1,34 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "./supabaseClient";
 
-const FAVORITES_KEY = "parfummeteo:favorites";
 
 export const getFavorites = async (): Promise<number[]> => {
-  try {
-    const data = await AsyncStorage.getItem(FAVORITES_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("perfume_id");
+  if (error) return [];
+  return data.map((f) => f.perfume_id);
 };
 
-export const addFavorite = async (id: number): Promise<void> => {
-  try {
-    const favorites = await getFavorites();
-    if (!favorites.includes(id)) {
-      await AsyncStorage.setItem(
-        FAVORITES_KEY,
-        JSON.stringify([...favorites, id])
-      );
-    }
-  } catch (e) {
-    console.error("Erreur ajout favori :", e);
-  }
+export const addFavorite = async (perfumeId: number): Promise<void> => {
+ const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("favorites").insert({
+    user_id: user.id,
+    perfume_id: perfumeId,
+  });
 };
 
-export const removeFavorite = async (id: number): Promise<void> => {
-  try {
-    const favorites = await getFavorites();
-    await AsyncStorage.setItem(
-      FAVORITES_KEY,
-      JSON.stringify(favorites.filter((fid) => fid !== id))
-    );
-  } catch (e) {
-    console.error("Erreur suppression favori :", e);
-  }
+export const removeFavorite = async (perfumeId: number): Promise<void> => {
+  await supabase.from("favorites").delete().eq("perfume_id", perfumeId);
 };
 
-export const toggleFavorite = async (id: number): Promise<boolean> => {
+export const toggleFavorite = async (perfumeId: number): Promise<boolean> => {
   const favorites = await getFavorites();
-  if (favorites.includes(id)) {
-    await removeFavorite(id);
+  if (favorites.includes(perfumeId)) {
+    await removeFavorite(perfumeId);
     return false;
   } else {
-    await addFavorite(id);
+    await addFavorite(perfumeId);
     return true;
   }
 };
