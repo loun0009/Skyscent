@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-logo.png",
+        "foregroundImage": "./assets/adaptative_logo.png",
         "backgroundColor": "#6b4eff"
       },
       "permissions": ["RECEIVE_BOOT_COMPLETED"],
