@@ -1,27 +1,25 @@
-import { Tabs, useRouter, useSegments } from "expo-router";
+import { Tabs, Redirect, useSegments } from "expo-router";
 import { Text } from "react-native";
-import { useEffect } from "react";
 import { FavoritesProvider } from "../src/context/FavoritesContext";
 import { AuthProvider, useAuth } from "../src/context/AuthContext";
 import { theme } from "../src/theme";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const router = useRouter();
   const segments = useSegments();
 
-  useEffect(() => {
-    if (loading) return;
+  if (loading) return null;
 
-    const inAuthScreen = segments[0] === "auth";
+  const inAuthScreen = segments[0] === "auth";
 
-    if (!user && !inAuthScreen) {
-      router.replace("/auth");
-    } else if (user && inAuthScreen) {
-      router.replace("/");
-    }
-  }, [user, loading, segments]);
-//
+  if (!user && !inAuthScreen) {
+    return <Redirect href="/auth" />;
+  }
+
+  if (user && inAuthScreen) {
+    return <Redirect href="/" />;
+  }
+
   return <>{children}</>;
 };
 

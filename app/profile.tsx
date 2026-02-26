@@ -1,14 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, ScrollView } from "react-native";
 import { useAuth } from "../src/context/AuthContext";
 import { useState } from "react";
-import { useRouter } from "expo-router";
 import { theme } from "../src/theme";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
 
 export default function ProfileScreen() {
     const { user, signOut, updateUserProfile } = useAuth();
-    const router = useRouter();
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [firstName, setFirstName] = useState(user?.first_name ?? "");
@@ -30,7 +28,6 @@ export default function ProfileScreen() {
 
     const handleSignOut = async () => {
         await signOut();
-      router.replace("/auth");
     };
 
     const displayName = user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email;
