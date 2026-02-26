@@ -1,114 +1,181 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { Perfume } from "../types";
+import { useEffect, useRef } from "react";
+import { theme } from "../theme";
+
 
 interface Props {
     perfume: Perfume;
     onPress: (perfume: Perfume) => void;
     isFavorite?: boolean;
     onToggleFavorite?: (id: number) => void;
+    index?: number;
 }
 
-const intensityColors = {
-    "légère": "#a8e6cf",
-    "modérée": "#ffd3a5",
-    "intense": "#fd9853"
+const intensityConfig = {
+  "légère": { color: theme.colors.intensityLight, dot: "#4CAF50" },
+  "modérée": { color: theme.colors.intensityMedium, dot: "#FF9800" },
+  "intense": { color: theme.colors.intensityStrong, dot: "#F44336" },
 };
 
-export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite }: Props) => {
+export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite, index = 0 }: Props) => {
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const intensity = intensityConfig[perfume.intensity];
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 400,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
     return (
-        <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)}>
-            <Image source={{ uri: perfume.image_url }} style={styles.image} />
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <View style={styles.titleBlock}>
-                        <Text style={styles.name} numberOfLines={1}>{perfume.name}</Text>
-                        <Text style={styles.brand}>{perfume.brand}</Text>
-                    </View>
-                    <View style={[styles.badge, { backgroundColor: intensityColors[perfume.intensity] }]}>
-                        <Text style={styles.badgeText}>{perfume.intensity}</Text>
-                    </View>
-                  {onToggleFavorite && (
-                    <TouchableOpacity style={styles.heartButton} onPress={() => onToggleFavorite(perfume.id)}>
-                      <Text style={styles.heart}>{isFavorite ? "❤️" : "🤍"}</Text>
-                    </TouchableOpacity>
-                  )}
-              </View>
-                <Text style={styles.description} numberOfLines={2}>
-                    {perfume.description}
-                </Text>
-                <Text style={styles.notes} numberOfLines={1}>
-                    Notes : {perfume.notes.join(". ")}
-                </Text>
+    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateX: slideAnim }],}}>
+      <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)} activeOpacity={0.8}>
+        <Image source={{ uri: perfume.image_url }} style={styles.image} />
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <View style={styles.titleBlock}>
+              <Text style={styles.name} numberOfLines={1}>{perfume.name}</Text>
+              <Text style={styles.brand}>{perfume.brand}</Text>
             </View>
-        </TouchableOpacity>
-    );
-}
+            <View style={styles.actions}>
+              <View style={[styles.badge, { backgroundColor: intensity.color }]}>
+                <View style={[styles.dot, { backgroundColor: intensity.dot }]} />
+                <Text style={styles.badgeText}>{perfume.intensity}</Text>
+              </View>
+              {onToggleFavorite && (
+                <TouchableOpacity style={styles.heartButton} onPress={() => onToggleFavorite(perfume.id)}>
+                  <Text style={styles.heart}>{isFavorite ? "❤️" : "🤍"}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          <Text style={styles.description} numberOfLines={2}>
+            {perfume.description}
+          </Text>
+
+          <View style={styles.notesRow}>
+            {perfume.notes.slice(0, 3).map((note) => (
+              <View key={note} style={styles.noteTag}>
+                <Text style={styles.noteText}>{note}</Text>
+              </View>
+            ))}
+            {perfume.notes.length > 3 && (
+              <Text style={styles.moreNotes}>+{perfume.notes.length - 3}</Text>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
     marginBottom: 12,
     flexDirection: "row",
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#c9a84c26",
   },
-  image: {
-    width: 100,
-    height: 100,
+  image: { 
+    width: 110, 
+    height: 110 
   },
-  content: {
-    flex: 1,
-    padding: 12,
-    justifyContent: "space-between",
+  content: { 
+    flex: 1, 
+    padding: 12, 
+    justifyContent: "space-between" 
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
-  titleBlock: {
-    flex: 1,
-    marginRight: 8,
+  titleBlock: { 
+    flex: 1, 
+    marginRight: 8 
   },
-  name: {
-    fontSize: 16,
+  name: { 
+    fontSize: 15, 
     fontWeight: "bold",
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary 
   },
-  brand: {
+  brand: { 
     fontSize: 12,
-    color: "#6B4EFF",
-    marginTop: 2,
+    color: theme.colors.gold, 
+    marginTop: 2 
+  },
+  actions: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 6 
   },
   badge: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 20,
+    gap: 4,
   },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#fff",
+  dot: { 
+    width: 5, 
+    height: 5, 
+    borderRadius: 3 
   },
-  description: {
-    fontSize: 12,
-    color: "#666",
-    lineHeight: 18,
-  },
-  notes: {
-    fontSize: 11,
-    color: "#999",
-    marginTop: 4,
+  badgeText: { 
+    fontSize: 10, 
+    fontWeight: "600", 
+    color: theme.colors.textPrimary 
   },
   heartButton: { 
     padding: 4 
   },
   heart: { 
     fontSize: 16 
+  },
+  description: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
+    marginVertical: 6,
+  },
+  notesRow: { 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    gap: 4 
+  },
+  noteTag: {
+    backgroundColor: "#c9a84c1a",
+    borderWidth: 1,
+    borderColor: "#c9a84c33",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 20,
+  },
+  noteText: { 
+    fontSize: 10, 
+    color: theme.colors.textMuted },
+  moreNotes: { 
+    fontSize: 10, 
+    color: theme.colors.textMuted, 
+    alignSelf: "center" 
   },
 });

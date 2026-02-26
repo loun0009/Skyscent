@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Button } from 'react-native'
 import { useState } from 'react'
 import { Filters, Perfume } from '../types'
+import { theme } from '../theme';
 
 interface Props {
     filters: Filters;
@@ -34,7 +35,7 @@ export const FilterBar = ({ filters, perfumes, activeCount, onGenderChange, onIn
             </TouchableOpacity>
 
             {activeCount > 0 && (
-                <Button title="x" color="#999" onPress={onReset} />
+                <Button title="x" color={theme.colors.textSecondary} onPress={onReset} />
             )}
 
             <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={() => setModalVisible(false)}>
@@ -42,7 +43,7 @@ export const FilterBar = ({ filters, perfumes, activeCount, onGenderChange, onIn
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>Filtres</Text>
-                            <Button title="x" color="#999" onPress={() => setModalVisible(false)} />
+                            <Button title="x" color={theme.colors.textSecondary} onPress={() => setModalVisible(false)} />
                         </View>
 
                         <Text style={styles.filterLabel}>Genre</Text>
@@ -99,40 +100,40 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterButton: {
-    backgroundColor: "#ede9ff",
+    backgroundColor: "#c9a84c1a",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
   },
   filterButtonActive: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
   },
   filterButtonText: {
-    color: "#6B4EFF",
+    color: theme.colors.gold,
     fontWeight: "600",
     fontSize: 14,
   },
   filterButtonTextActive: {
-    color: "#fff",
+    color: theme.colors.card,
   },
   resetButton: {
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: theme.colors.textSecondary,
   },
   resetText: {
-    color: "#999",
+    color: theme.colors.textSecondary,
     fontSize: 13,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: theme.colors.background,
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -147,16 +148,16 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary,
   },
   closeButton: {
     fontSize: 18,
-    color: "#999",
+    color: theme.colors.textSecondary,
   },
   filterLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary,
     marginBottom: 10,
   },
   pillRow: {
@@ -166,29 +167,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.colors.card,
     marginRight: 8,
   },
   pillActive: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
   },
   pillText: {
-    color: "#555",
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   pillTextActive: {
-    color: "#fff",
+    color: theme.colors.card,
     fontWeight: "600",
   },
   applyButton: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
     padding: 16,
     borderRadius: 14,
     alignItems: "center",
     marginTop: 8,
   },
   applyButtonText: {
-    color: "#fff",
+    color: theme.colors.card,
     fontWeight: "bold",
     fontSize: 16,
   },

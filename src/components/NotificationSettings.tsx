@@ -1,6 +1,7 @@
 import { View, Text, Switch, TouchableOpacity, StyleSheet, Modal, ScrollView } from "react-native";
 import { useState } from "react";
 import { Perfume } from "../types";
+import { theme } from "../theme";
 
 interface Props {
     enabled: boolean;
@@ -58,8 +59,8 @@ export const NotificationSettings = ({
         <Switch
           value={enabled}
           onValueChange={handleToggle}
-          trackColor={{ false: "#ddd", true: "#c4b5fd" }}
-          thumbColor={enabled ? "#6B4EFF" : "#f4f3f4"}
+          trackColor={{ false: theme.colors.textSecondary, true: theme.colors.goldDark }}
+          thumbColor={enabled ? theme.colors.gold : theme.colors.card}
         />
       </View>
 
@@ -143,11 +144,11 @@ export const NotificationSettings = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -161,32 +162,32 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 16, 
     fontWeight: "bold", 
-    color: "#1a1a2e" 
+    color: theme.colors.textPrimary 
 },
   subtitle: { 
     fontSize: 13, 
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     marginTop: 2 
 },
   timeButton: {
     marginTop: 12,
-    backgroundColor: "#ede9ff",
+    backgroundColor: "#c9a84c1a",
     padding: 10,
     borderRadius: 10,
     alignItems: "center",
   },
   timeButtonText: { 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontWeight: "600", 
     fontSize: 14 
 },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: theme.colors.background,
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary,
     marginBottom: 24,
     textAlign: "center",
   },
@@ -208,8 +209,9 @@ const styles = StyleSheet.create({
   pickerColumn: { 
     alignItems: "center" 
 },
-  pickerLabel: { fontSize: 13
-    , color: "#999", 
+  pickerLabel: { 
+    fontSize: 13, 
+    color: theme.colors.textSecondary, 
     marginBottom: 8 
 },
   picker: { 
@@ -223,30 +225,30 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pickerItemActive: { 
-    backgroundColor: "#ede9ff" 
+    backgroundColor: "#c9a84c1a" 
 },
   pickerItemText: { 
     fontSize: 18, 
-    color: "#555" 
+    color: theme.colors.textPrimary 
 },
   pickerItemTextActive: { 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontWeight: "bold" 
 },
   separator: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     marginHorizontal: 16 
 },
   saveButton: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
     padding: 16,
     borderRadius: 14,
     alignItems: "center",
     marginBottom: 12,
   },
-  saveButtonText: { color: "#fff", 
+  saveButtonText: { color: theme.colors.card, 
     fontWeight: "bold", 
     fontSize: 16 
 },
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
     padding: 12 
 },
   cancelButtonText: { 
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     fontSize: 15 
 },
 });
