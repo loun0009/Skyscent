@@ -6,11 +6,6 @@ export const fetchPerfumes = async (): Promise<Perfume[]> => {
     .from("perfumes")
     .select("*")
     .order("name", { ascending: true });
-
-  console.log("data :", JSON.stringify(data));
-  console.log("error :", JSON.stringify(error));
-  console.log("type error :", typeof error);
-
   if (error) {
     console.error("Erreur complète :", JSON.stringify(error));
     throw new Error(error.message);
