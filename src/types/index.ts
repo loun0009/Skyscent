@@ -33,3 +33,19 @@ export interface Filters {
     intensity: 'tous' | 'légère' | 'modérée' | 'intense';
     brand: string;
 }
+
+export interface User {
+    id: string;
+    email: string;
+    created_at: string;
+    first_name: string | null;
+    last_name: string | null;
+    age: number | null;
+    gender: "homme" | "femme" | "autre" | null;
+}
+
+export interface AuthState {
+    user: User | null;
+    loading: boolean;
+    error: string | null;
+}
