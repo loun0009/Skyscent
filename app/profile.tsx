@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator,
 import { useAuth } from "../src/context/AuthContext";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { theme } from "../src/theme";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
 
@@ -29,7 +30,7 @@ export default function ProfileScreen() {
 
     const handleSignOut = async () => {
         await signOut();
-        router.replace("/auth");
+      router.replace("/auth");
     };
 
     const displayName = user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email;
@@ -75,7 +76,7 @@ export default function ProfileScreen() {
                         value={firstName}
                         onChangeText={setFirstName}
                         placeholder="Ton prénom"
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor={theme.colors.textSecondary}
                     />
 
                     <Text style={styles.label}>Nom</Text>
@@ -84,7 +85,7 @@ export default function ProfileScreen() {
                         value={lastName}
                         onChangeText={setLastName}
                         placeholder="Ton nom"
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor={theme.colors.textSecondary}
                     />
 
                     <Text style={styles.label}>Âge</Text>
@@ -93,7 +94,7 @@ export default function ProfileScreen() {
                         value={age}
                         onChangeText={setAge}
                         placeholder="Ton âge"
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor={theme.colors.textSecondary}
                         keyboardType="numeric"
                         maxLength={3}
                     />
@@ -114,7 +115,7 @@ export default function ProfileScreen() {
                             <Text style={styles.cancelText}>Annuler</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
-                            {saving ? (<ActivityIndicator color="#fff" size="small" />
+                            {saving ? (<ActivityIndicator color={theme.colors.card} size="small" />
                             ) : (<Text style={styles.saveText}>Enregistrer</Text>)}
                         </TouchableOpacity>
                     </View>
@@ -163,7 +164,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   wrapper: { 
     flex: 1, 
-    backgroundColor: "#f8f8fc" 
+    backgroundColor: theme.colors.background 
 },
   container: { 
     flex: 1 
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
   headline: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     marginBottom: 24 
 },
   avatarSection: { 
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     width: 80, 
     height: 80, 
     borderRadius: 40,
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
     justifyContent: "center", 
     alignItems: "center", 
     marginBottom: 12,
@@ -195,25 +196,25 @@ const styles = StyleSheet.create({
   avatarText: { 
     fontSize: 32, 
     fontWeight: "bold", 
-    color: "#fff" 
+    color: theme.colors.card 
 },
   displayName: { 
     fontSize: 20, 
     fontWeight: "bold", 
-    color: "#1a1a2e" 
+    color: theme.colors.textPrimary 
 },
   email: { 
     fontSize: 14, 
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     marginTop: 4 
 },
   since: { 
     fontSize: 12, 
-    color: "#bbb", 
+    color: theme.colors.textMuted, 
     marginTop: 4 
 },
   card: {
-    backgroundColor: "#fff", 
+    backgroundColor: theme.colors.card, 
     borderRadius: 16, 
     padding: 16,
     marginBottom: 16,
@@ -235,11 +236,11 @@ const styles = StyleSheet.create({
   cardTitle: { 
     fontSize: 16, 
     fontWeight: "bold", 
-    color: "#1a1a2e" 
+    color: theme.colors.textPrimary 
 },
   editButton: { 
     fontSize: 13, 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontWeight: "600" 
 },
   infoRow: {
@@ -250,28 +251,28 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f0f0f0",
   },
   infoLabel: { 
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     fontSize: 14 
 },
   infoValue: { 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     fontSize: 14, 
     fontWeight: "600" 
 },
   label: { 
     fontSize: 13, 
     fontWeight: "600", 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     marginTop: 12, 
     marginBottom: 6 },
   input: {
-    backgroundColor: "#f8f8fc", 
+    backgroundColor: theme.colors.background, 
     borderRadius: 10, 
     padding: 12,
     fontSize: 14, 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     borderWidth: 1, 
-    borderColor: "#e8e8e8",
+    borderColor: theme.colors.textSecondary,
   },
   genderRow: { 
     flexDirection: "row", 
@@ -282,19 +283,19 @@ const styles = StyleSheet.create({
     flex: 1, 
     padding: 10, 
     borderRadius: 10,
-    backgroundColor: "#f0f0f0", 
+    backgroundColor: theme.colors.background, 
     alignItems: "center",
   },
   genderPillActive: { 
-    backgroundColor: "#6B4EFF" 
+    backgroundColor: theme.colors.gold 
 },
   genderText: { 
     fontSize: 13, 
-    color: "#555", 
+    color: theme.colors.textSecondary, 
     fontWeight: "500" 
 },
   genderTextActive: { 
-    color: "#fff", 
+    color: theme.colors.card, 
     fontWeight: "600" 
 },
   editActions: { 
@@ -307,32 +308,32 @@ const styles = StyleSheet.create({
     padding: 12, 
     borderRadius: 10,
     borderWidth: 1, 
-    borderColor: "#ddd", 
+    borderColor: theme.colors.textSecondary, 
     alignItems: "center",
   },
   cancelText: { 
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     fontWeight: "600" 
 },
   saveButton: {
     flex: 2, 
     padding: 12, 
     borderRadius: 10,
-    backgroundColor: "#6B4EFF", 
+    backgroundColor: theme.colors.gold, 
     alignItems: "center",
   },
   saveText: { 
-    color: "#fff", 
+    color: theme.colors.card, 
     fontWeight: "bold" 
 },
   signOutButton: {
-    backgroundColor: "#ffe5e5", 
+    backgroundColor: theme.colors.background, 
     padding: 16,
     borderRadius: 14, 
     alignItems: "center",
   },
   signOutText: { 
-    color: "#e53e3e", 
+    color: theme.colors.error, 
     fontWeight: "bold", 
     fontSize: 15 
 },

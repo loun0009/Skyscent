@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { useState } from "react";
 import { useAuth } from "../src/context/AuthContext";
 import { useRouter } from "expo-router";
+import { theme } from "../src/theme";
 
 export default function AuthScreen() {
     const { signIn, signUp, loading, error, clearError } = useAuth();
@@ -25,7 +26,7 @@ export default function AuthScreen() {
         if (isLogin) {
             const success = await signIn(email, password);
         if (success) {
-            router.replace("/");
+          router.replace("/");
         } 
         } else {
         const success = await signUp(email, password);
@@ -96,7 +97,7 @@ export default function AuthScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="ton@gmail.com"
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor="#aaaaaa"
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -107,7 +108,7 @@ export default function AuthScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="********"
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor="#aaaaaa"
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -122,7 +123,7 @@ export default function AuthScreen() {
                                     confirmPassword && password !== confirmPassword ? styles.inputError : null,
                                 ]}
                                 placeholder="********"
-                                placeholderTextColor="#aaa"
+                                placeholderTextColor="#aaaaaa"
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
                                 secureTextEntry
@@ -132,7 +133,7 @@ export default function AuthScreen() {
 
                     <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={handleSubmit} disabled={loading}>
                         {loading ? (
-                            <ActivityIndicator color="#fff" />
+                            <ActivityIndicator color={theme.colors.card} />
                         ) : (
                         <Text style={styles.buttonText}>{isLogin ? "Se connecter" : "S'inscrire"}</Text>
                         )}
@@ -155,7 +156,7 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   wrapper: { 
     flex: 1, 
-    backgroundColor: "#f8f8fc" 
+    backgroundColor: theme.colors.background 
 },
   container: {
     flex: 1,
@@ -173,11 +174,11 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 32, 
     fontWeight: "bold", 
-    color: "#1a1a2e" 
+    color: theme.colors.textPrimary 
 },
   subtitle: {
     fontSize: 14,
-    color: "#999",
+    color: theme.colors.textSecondary,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 20,
@@ -186,28 +187,28 @@ const styles = StyleSheet.create({
     marginBottom: 24 
 },
   errorBox: {
-    backgroundColor: "#ffe5e5",
+    backgroundColor: theme.colors.background,
     borderRadius: 10,
     padding: 12,
     marginBottom: 16,
 },
   errorText: { 
-    color: "#e53e3e", 
+    color: theme.colors.error, 
     fontSize: 13 
 },
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary,
     marginBottom: 8,
     marginTop: 16,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.card,
     borderRadius: 12,
     padding: 14,
     fontSize: 15,
-    color: "#1a1a2e",
+    color: theme.colors.textPrimary,
     borderWidth: 1,
     borderColor: "#e8e8e8",
   },
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     marginTop: 4 
 },
   button: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.gold,
     padding: 16,
     borderRadius: 14,
     alignItems: "center",
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
     opacity: 0.6 
 },
   buttonText: { 
-    color: "#fff", 
+    color: theme.colors.card, 
     fontWeight: "bold", 
     fontSize: 16 
 },
@@ -241,16 +242,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   footerText: { 
-    color: "#999", 
+    color: theme.colors.textSecondary,
     fontSize: 14 
 },
   switchText: { 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontWeight: "600", 
     fontSize: 14 
 },
 emailHighlight: {
-  color: "#6B4EFF",
+  color: theme.colors.gold,
   fontWeight: "600",
 },
 resendButton: {
@@ -259,7 +260,7 @@ resendButton: {
   marginTop: 8,
 },
 resendText: {
-  color: "#999",
+  color: theme.colors.textSecondary,
   fontSize: 14,
   textDecorationLine: "underline",
 },

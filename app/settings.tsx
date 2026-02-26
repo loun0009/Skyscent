@@ -3,6 +3,7 @@ import { useNotifications } from "../src/hooks/useNotifications";
 import { usePerfumes } from "../src/hooks/usePerfumes";
 import { useWeather } from "../src/hooks/useWeather";
 import { NotificationSettings } from "../src/components/NotificationSettings";
+import { theme } from "../src/theme";
 
 export default function SettingsScreen() {
     const { weather } = useWeather();
@@ -38,7 +39,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   wrapper: { 
     flex: 1, 
-    backgroundColor: "#f8f8fc" 
+    backgroundColor: theme.colors.background 
 },
   container: { 
     flex: 1 
@@ -51,23 +52,23 @@ const styles = StyleSheet.create({
   headline: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     marginBottom: 24 
 },
   infoCard: {
-    backgroundColor: "#ede9ff",
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 16,
   },
   infoTitle: { 
     fontSize: 15, 
     fontWeight: "bold", 
-    color: "#6B4EFF", 
+    color: theme.colors.textPrimary, 
     marginBottom: 8 
 },
   infoText: { 
     fontSize: 13, 
-    color: "#555", 
+    color: theme.colors.textSecondary, 
     lineHeight: 20 
 },
 });

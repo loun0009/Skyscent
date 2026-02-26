@@ -3,6 +3,7 @@ import { Text } from "react-native";
 import { useEffect } from "react";
 import { FavoritesProvider } from "../src/context/FavoritesContext";
 import { AuthProvider, useAuth } from "../src/context/AuthContext";
+import { theme } from "../src/theme";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -33,13 +34,13 @@ export default function RootLayout() {
           screenOptions={{
             headerShown: false,
             tabBarStyle: {
-              backgroundColor: "#fff",
-              borderTopColor: "#eee",
+              backgroundColor: theme.colors.surface,
+              borderTopColor: "#c9a84c26",
               height: 60,
               paddingBottom: 8,
             },
-            tabBarActiveTintColor: "#6B4EFF",
-            tabBarInactiveTintColor: "#aaa",
+            tabBarActiveTintColor: theme.colors.gold,
+            tabBarInactiveTintColor: theme.colors.textMuted,
             tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
           }}
         >

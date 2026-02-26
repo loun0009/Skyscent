@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useFavorites } from "../src/context/FavoritesContext";
 import { PerfumeCard } from "../src/components/perfumeCard";
 import { Perfume } from "../src/types";
+import { theme } from "../src/theme";
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -46,12 +47,41 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  wrapper: { flex: 1, backgroundColor: "#f8f8fc" },
+  wrapper: { 
+    flex: 1, 
+    backgroundColor: theme.colors.background 
+  },
   container: { flex: 1 },
-  content: { padding: 20, paddingTop: 60, paddingBottom: 40 },
-  headline: { fontSize: 28, fontWeight: "bold", color: "#1a1a2e", marginBottom: 24 },
-  empty: { flex: 1, alignItems: "center", marginTop: 80 },
-  emptyEmoji: { fontSize: 56, marginBottom: 16 },
-  emptyTitle: { fontSize: 18, fontWeight: "bold", color: "#1a1a2e", marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: "#999", textAlign: "center", lineHeight: 22 },
+  content: { 
+    padding: 20, 
+    paddingTop: 60, 
+    paddingBottom: 40 
+  },
+  headline: { 
+    fontSize: 28, 
+    fontWeight: "bold", 
+    color: theme.colors.textPrimary, 
+    marginBottom: 24 
+  },
+  empty: { 
+    flex: 1, 
+    alignItems: "center", 
+    marginTop: 80 
+  },
+  emptyEmoji: { 
+    fontSize: 56, 
+    marginBottom: 16 
+  },
+  emptyTitle: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    color: theme.colors.textPrimary, 
+    marginBottom: 8 
+  },
+  emptySubtitle: { 
+    fontSize: 14, 
+    color: theme.colors.textSecondary, 
+    textAlign: "center", 
+    lineHeight: 22 
+  },
 });

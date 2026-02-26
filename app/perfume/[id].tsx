@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIn
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchPerfumeById } from "../../src/services/perfumesApi";
 import { Perfume } from "../../src/types";
+import { theme } from "../../src/theme";
 
 export default function PerfumeDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -22,7 +23,7 @@ export default function PerfumeDetailScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#6B4EFF" />
+        <ActivityIndicator size="large" color={theme.colors.gold} />
       </View>
     );
   }
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
 },
   container: { 
     flex: 1, 
-    backgroundColor: "#f8f8fc" 
+    backgroundColor: theme.colors.background 
 },
   backButton: { 
     padding: 20, 
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
 },
   backText: { 
     fontSize: 16, 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontWeight: "600" 
 },
   image: { 
@@ -113,17 +114,17 @@ const styles = StyleSheet.create({
   name: { 
     fontSize: 28, 
     fontWeight: "bold", 
-    color: "#1a1a2e" 
+    color: theme.colors.textPrimary
 },
   brand: { 
     fontSize: 16, 
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     marginTop: 4, 
     marginBottom: 16 
 },
   description: { 
     fontSize: 15, 
-    color: "#555", 
+    color: theme.colors.textSecondary, 
     lineHeight: 24, 
     marginBottom: 24 
 },
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   sectionTitle: { 
     fontSize: 16, 
     fontWeight: "bold", 
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     marginBottom: 12 
 },
   tags: {
@@ -142,13 +143,13 @@ const styles = StyleSheet.create({
     gap: 8 
     },
   tag: { 
-    backgroundColor: "#ede9ff", 
+    backgroundColor: theme.colors.background, 
     paddingHorizontal: 12, 
     paddingVertical: 6, 
     borderRadius: 20 
 },
   tagText: {
-    color: "#6B4EFF", 
+    color: theme.colors.gold, 
     fontSize: 13, 
     fontWeight: "500" 
     },
@@ -160,17 +161,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eee" 
     },
   infoLabel: {
-    color: "#999", 
+    color: theme.colors.textSecondary, 
     fontSize: 14 
 },
   infoValue: {
-    color: "#1a1a2e", 
+    color: theme.colors.textPrimary, 
     fontSize: 14, 
     fontWeight: "600" 
 },
   errorText: {
     fontSize: 16,
-    color: "#1a1a2e",
+    color: theme.colors.error,
     fontWeight: "600"
   },
 });
