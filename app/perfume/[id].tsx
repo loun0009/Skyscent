@@ -4,12 +4,23 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchPerfumeById } from "../../src/services/perfumesApi";
 import { Perfume } from "../../src/types";
 import { theme } from "../../src/theme";
+import { useHistory } from "../../src/context/HistoryContext";
+import { useWeather } from "../../src/hooks/useWeather";
 
 export default function PerfumeDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [perfume, setPerfume] = useState<Perfume | null>(null);
   const [loading, setLoading] = useState(true);
+  const { addEntry, checkWornToday } = useHistory();
+  const { weather } = useWeather();
+  const alreadyWornToday = perfume ? checkWornToday(perfume.id) : false;
+  const [justAdded, setJustAdded] = useState(false);
+  const handleWorn = async () => {
+    if (!perfume || alreadyWornToday) return;
+    await addEntry(perfume.id, weather?.temperature ?? null, weather?.condition ?? null, weather?.city ?? null);
+    setJustAdded(true);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -79,6 +90,11 @@ export default function PerfumeDetailScreen() {
             <Text style={styles.infoValue}>{perfume.temp_min}°C → {perfume.temp_max}°C</Text>
           </View>
         </View>
+        <TouchableOpacity style={[styles.wornButton, alreadyWornToday  && styles.wornButtonActive]} onPress={handleWorn} disabled={alreadyWornToday}>
+          <Text style={styles.wornButtonText}>
+            {alreadyWornToday ? "📅 Déjà ajouté à votre historique du jour": justAdded ? "✅ Ajouté à l'historique !" : "💧 J'ai porté ce parfum aujourd'hui"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -174,4 +190,29 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontWeight: "600"
   },
+  wornButton: {
+  backgroundColor: "#c9a84c1a",
+  borderWidth: 1,
+  borderColor: theme.colors.gold,
+  padding: 16,
+  borderRadius: 14,
+  alignItems: "center",
+  marginBottom: 24,
+},
+wornButtonActive: {
+  backgroundColor: "#4caf501a",
+  borderColor: theme.colors.success,
+},
+wornButtonText: {
+  color: theme.colors.gold,
+  fontWeight: "bold",
+  fontSize: 15,
+},
+wornButtonDisabled: {
+  backgroundColor: "#4a454033",
+  borderColor: theme.colors.textMuted,
+},
+wornButtonTextDisabled: {
+  color: theme.colors.textMuted,
+},
 });
