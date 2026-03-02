@@ -3,6 +3,7 @@ import { Text } from "react-native";
 import { FavoritesProvider } from "../src/context/FavoritesContext";
 import { AuthProvider, useAuth } from "../src/context/AuthContext";
 import { theme } from "../src/theme";
+import { HistoryProvider } from "../src/context/HistoryContext";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -27,6 +28,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <FavoritesProvider>
+        <HistoryProvider>
         <AuthGuard>
         <Tabs
           screenOptions={{
@@ -61,6 +63,15 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
+            name="history"
+            options={{
+              title: "Historique",
+              tabBarIcon: ({ color }) => (
+                <Text style={{ fontSize: 20, color }}>📖</Text>
+            ),
+          }}
+          />
+          <Tabs.Screen
             name="profile"
             options={{
               title: "Profil",
@@ -88,6 +99,7 @@ export default function RootLayout() {
           />
         </Tabs>
         </AuthGuard>
+        </HistoryProvider>
       </FavoritesProvider>
     </AuthProvider>
   );
