@@ -49,3 +49,14 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
 }
+
+export interface HistoryEntry {
+    id: number;
+    user_id: string;
+    perfume_id: number;
+    worn_at: string;
+    temperature: number | null;
+    weather_condition: string | null;
+    city: string | null;
+    perfume: Perfume;
+}
