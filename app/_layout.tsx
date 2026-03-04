@@ -65,19 +65,13 @@ export default function RootLayout() {
           <Tabs.Screen
             name="favorites"
             options={{
-              title: "Favoris",
-              tabBarIcon: ({ color }) => (
-                <Text style={{ fontSize: 20, color }}>❤️</Text>
-              ),
+              href: null,
             }}
           />
           <Tabs.Screen
             name="history"
             options={{
-              title: "Historique",
-              tabBarIcon: ({ color }) => (
-                <Text style={{ fontSize: 20, color }}>📖</Text>
-            ),
+              href: null,
           }}
           />
           <Tabs.Screen
@@ -101,10 +95,7 @@ export default function RootLayout() {
           <Tabs.Screen
             name="settings"
             options={{
-              title: "Paramètres",
-              tabBarIcon: ({ color }) => (
-                <Text style={{ fontSize: 20, color }}>⚙️</Text>
-              ),
+              href: null,
             }}
           />
           <Tabs.Screen
