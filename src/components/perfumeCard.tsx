@@ -48,8 +48,8 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
         <View style={styles.imageContainer}>
           <Image source={imageError || !perfume.image_url ? require("../../assets/adaptative_logo.png") : { uri: perfume.image_url }}
             style={styles.image}
-            resizeMode="cover" 
-            onError={() => setImageError(true)} 
+            resizeMode="contain"
+            onError={() => setImageError(true)}
           />
         </View>
         <View style={styles.content}>
@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#c9a84c26",
+    minHeight: 120,
   },
   imageContainer: {
-    width: 110,
-    height: 110,
+    width: 120,
+    height: 120,
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    overflow: "hidden",
 },
   image: { 
     width: 110, 
