@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useFavorites } from "../src/context/FavoritesContext";
 import { PerfumeCard } from "../src/components/perfumeCard";
@@ -21,6 +21,9 @@ export default function FavoritesScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.headline}>Mes favoris ❤️</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backText}>←</Text>
+        </TouchableOpacity>
 
         {!loading && favoritePerfumes.length === 0 ? (
           <View style={styles.empty}>
@@ -83,5 +86,19 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary, 
     textAlign: "center", 
     lineHeight: 22 
+  },
+   backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.2)",
+  },
+  backText: {
+    fontSize: 18,
+    color: theme.colors.gold,
   },
 });
