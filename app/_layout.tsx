@@ -54,6 +54,15 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
+            name="catalog"
+            options={{
+              title: "Catalogue",
+              tabBarIcon: ({ color }) => (
+                <Text style={{ fontSize: 20, color }}>🌸</Text>
+              ),
+            }}
+          />
+          <Tabs.Screen
             name="favorites"
             options={{
               title: "Favoris",
