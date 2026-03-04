@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator,
 import { useAuth } from "../src/context/AuthContext";
 import { useRef, useState } from "react";
 import { theme } from "../src/theme";
+import { router } from "expo-router/build/exports";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
 const STEPS = 3;
@@ -233,6 +234,32 @@ export default function ProfileScreen() {
                     year: "numeric",
                     })}
                 </Text>
+            </View>
+            {/* Raccourcis */}
+            <View style={styles.shortcutsRow}>
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => router.push("/history")}
+              >
+                <Text style={styles.shortcutEmoji}>📖</Text>
+                <Text style={styles.shortcutLabel}>Historique</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => router.push("/settings")}
+              >
+                <Text style={styles.shortcutEmoji}>⚙️</Text>
+                <Text style={styles.shortcutLabel}>Paramètres</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => router.push("/favorites")}
+              >
+                <Text style={styles.shortcutEmoji}>❤️</Text>
+                <Text style={styles.shortcutLabel}>Favoris</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Infos profil */}
@@ -643,5 +670,28 @@ const styles = StyleSheet.create({
     color: theme.colors.background, 
     fontWeight: "bold", 
     fontSize: 16 
+  },
+  shortcutsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 20,
+  },
+  shortcutCard: {
+    flex: 1,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: 16,
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.15)",
+  },
+  shortcutEmoji: {
+    fontSize: 24,
+  },
+  shortcutLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
   },
 });
