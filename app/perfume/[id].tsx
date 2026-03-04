@@ -122,7 +122,8 @@ const styles = StyleSheet.create({
   image: { 
     width: "100%", 
     height: 280, 
-    resizeMode: "cover" 
+    resizeMode: "contain", 
+    backgroundColor: theme.colors.cardElevated, 
 },
   content: { 
     padding: 20 
