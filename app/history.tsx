@@ -75,6 +75,9 @@ export default function HistoryScreen() {
     <View style={styles.wrapper}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backText}>←</Text>
+          </TouchableOpacity>
           <Text style={styles.headline}>Historique 📖</Text>
           {history.length > 0 && (
             <TouchableOpacity onPress={handleClearAll}>
@@ -261,5 +264,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.error,
     fontWeight: "bold",
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.2)",
+  },
+  backText: {
+    fontSize: 18,
+    color: theme.colors.gold,
   },
 });

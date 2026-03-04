@@ -1,9 +1,10 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { useNotifications } from "../src/hooks/useNotifications";
 import { usePerfumes } from "../src/hooks/usePerfumes";
 import { useWeather } from "../src/hooks/useWeather";
 import { NotificationSettings } from "../src/components/NotificationSettings";
 import { theme } from "../src/theme";
+import { router } from "expo-router/build/exports";
 
 export default function SettingsScreen() {
     const { weather } = useWeather();
@@ -15,6 +16,9 @@ export default function SettingsScreen() {
         <View style={styles.wrapper}>
             <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 <Text style={styles.headline}>Paramètres ⚙️</Text>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                  <Text style={styles.backText}>←</Text>
+                </TouchableOpacity>
                 <NotificationSettings
                     enabled={settings.enabled}
                     hour={settings.hour}
@@ -71,4 +75,18 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary, 
     lineHeight: 20 
 },
+backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.card,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(201, 168, 76, 0.2)",
+  },
+  backText: {
+    fontSize: 18,
+    color: theme.colors.gold,
+  },
 });
