@@ -17,6 +17,9 @@ interface AuthContextType {
         last_name?:string;
         age?: number;
         gender?: "homme" | "femme" | "autre";
+        preferred_intensity?: "légère" | "modérée" | "intense";
+        preferred_season?: "spring" | "summer" | "autumn" | "winter";
+        onboarding_completed?: boolean;
     }) => Promise<boolean>;
 }
 
@@ -36,6 +39,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             last_name: profile?.last_name ?? null,
             age: profile?.age ?? null,
             gender: profile?.gender ?? null,
+            preferred_intensity: profile?.preferred_intensity ?? null,
+            preferred_season: profile?.preferred_season ?? null,
+            onboarding_completed: profile?.onboarding_completed ?? false,
         };
   };
 
@@ -104,6 +110,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         last_name?: string;
         age?: number;
         gender?: "homme" | "femme" | "autre";
+        preferred_intensity?: "légère" | "modérée" | "intense";
+        preferred_season?: "spring" | "summer" | "autumn" | "winter";
+        onboarding_completed?: boolean;
     }): Promise<boolean> => {
         if (!user) return false;
         const success = await updateProfile(user.id, updates);

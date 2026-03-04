@@ -42,6 +42,9 @@ export interface User {
     last_name: string | null;
     age: number | null;
     gender: "homme" | "femme" | "autre" | null;
+    preferred_intensity: "légère" | "modérée" | "intense" | null;
+    preferred_season: "spring" | "summer" | "autumn" | "winter" | null;
+    onboarding_completed: boolean;
 }
 
 export interface AuthState {

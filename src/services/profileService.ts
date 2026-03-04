@@ -13,7 +13,10 @@ export const fetchProfile = async (userId : string): Promise<Partial<User> | nul
         first_name: data.first_name,
         last_name: data.last_name,
         age: data.age,
-        gender: data.gender
+        gender: data.gender,
+        preferred_intensity: data.preferred_intensity,
+        preferred_season: data.preferred_season,
+        onboarding_completed: data.onboarding_completed ?? false,
     };
 };
 
@@ -24,6 +27,9 @@ export const updateProfile = async (
         last_name?: string;
         age?: number;
         gender?: "homme" | "femme" | "autre";
+        preferred_intensity?: "légère" | "modérée" | "intense";
+        preferred_season?: "spring" | "summer" | "autumn" | "winter";
+        onboarding_completed?: boolean;
     }
 ): Promise<boolean> => {
     const {error} = await supabase
