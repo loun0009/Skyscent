@@ -13,7 +13,7 @@ interface HistoryContextType {
     city: string | null
   ) => Promise<void>;
   removeEntry: (id: number) => Promise<void>;
-  clear: () => Promise<void>;
+  clearAll: () => Promise<void>;
   refresh: () => Promise<void>;
   checkWornToday: (perfumeId: number) => boolean;
 }
@@ -54,7 +54,7 @@ export const HistoryProvider = ({ children }: { children: ReactNode }) => {
     await deleteHistoryEntry(id);
   };
 
-  const clear = async () => {
+  const clearAll = async () => {
     setHistory([]);
     await clearHistory();
   };
@@ -66,7 +66,7 @@ export const HistoryProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <HistoryContext.Provider
-      value={{ history, loading, addEntry, removeEntry, clear, refresh, checkWornToday }}
+      value={{ history, loading, addEntry, removeEntry, clearAll, refresh, checkWornToday }}
     >
       {children}
     </HistoryContext.Provider>
