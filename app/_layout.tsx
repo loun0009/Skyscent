@@ -72,6 +72,15 @@ export default function RootLayout() {
           }}
           />
           <Tabs.Screen
+            name="map"
+            options={{
+              title: "Carte",
+              tabBarIcon: ({ color }) => (
+                <Text style={{ fontSize: 20, color }}>🗺️</Text>
+              ),
+            }}
+          />
+          <Tabs.Screen
             name="profile"
             options={{
               title: "Profil",
