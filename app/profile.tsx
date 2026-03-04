@@ -1,9 +1,24 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, ScrollView, Animated, KeyboardAvoidingView, Platform } from "react-native";
 import { useAuth } from "../src/context/AuthContext";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { theme } from "../src/theme";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
+const STEPS = 3;
+
+const INTENSITY_OPTIONS = [
+  { value: "légère", label: "Légère", emoji: "🌸", desc: "Discrète et fraîche" },
+  { value: "modérée", label: "Modérée", emoji: "🌺", desc: "Équilibrée et polyvalente" },
+  { value: "intense", label: "Intense", emoji: "🔥", desc: "Puissante et envoûtante" },
+] as const;
+
+const SEASON_OPTIONS = [
+  { value: "spring", label: "Printemps", emoji: "🌱" },
+  { value: "summer", label: "Été", emoji: "☀️" },
+  { value: "autumn", label: "Automne", emoji: "🍂" },
+  { value: "winter", label: "Hiver", emoji: "❄️" },
+] as const;
+
 
 export default function ProfileScreen() {
     const { user, signOut, updateUserProfile } = useAuth();
@@ -13,6 +28,51 @@ export default function ProfileScreen() {
     const [lastName, setLastName] = useState(user?.last_name ?? "");
     const [age, setAge] = useState(user?.age?.toString() ?? "");
     const [gender, setGender] = useState<"homme" | "femme" | "autre" | null>( user?.gender ?? null );
+    const [step, setStep] = useState(1);
+    const [intensity, setIntensity] = useState<"légère" | "modérée" | "intense" | null>(null);
+    const [season, setSeason] = useState<"spring" | "summer" | "autumn" | "winter" | null>(null);
+    const fadeAnim = useRef(new Animated.Value(1)).current;
+    const slideAnim = useRef(new Animated.Value(0)).current;
+
+    const animateStep = () => {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: -30, duration: 200, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+      ]),
+    ]).start();
+  };
+
+  const goNext = () => {
+    animateStep();
+    setTimeout(() => setStep((s) => s + 1), 200);
+  };
+
+  const canProceed = () => {
+    if (step === 1) return firstName.trim().length > 0 && lastName.trim().length > 0;
+    if (step === 2) return intensity !== null;
+    if (step === 3) return season !== null;
+    return false;
+  };
+
+  const handleFinish = async () => {
+    setSaving(true);
+    await updateUserProfile({
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      preferred_intensity: intensity ?? undefined,
+      preferred_season: season ?? undefined,
+      onboarding_completed: true,
+    });
+    setSaving(false);
+  };
+
+
+
 
     const handleSave = async () => {
         setSaving(true);
@@ -29,6 +89,127 @@ export default function ProfileScreen() {
     const handleSignOut = async () => {
         await signOut();
     };
+
+    if (!user?.onboarding_completed) {
+    return (
+      <KeyboardAvoidingView
+        style={styles.wrapper}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={styles.onboardingContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.progressContainer}>
+            {Array.from({ length: STEPS }).map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.progressDot,
+                  i + 1 <= step && styles.progressDotActive,
+                  i + 1 === step && styles.progressDotCurrent,
+                ]}
+              />
+            ))}
+          </View>
+
+          <Animated.View
+            style={[{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
+          >
+            {step === 1 && (
+              <View>
+                <Text style={styles.emoji}>👋</Text>
+                <Text style={styles.title}>Bienvenue sur SkyScent !</Text>
+                <Text style={styles.subtitle}>
+                  Commençons par faire connaissance. Comment t'appelles-tu ?
+                </Text>
+                <Text style={styles.label}>Prénom</Text>
+                <TextInput
+                  style={styles.input}
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  placeholder="Ton prénom"
+                  placeholderTextColor={theme.colors.textMuted}
+                  autoFocus
+                />
+                <Text style={styles.label}>Nom</Text>
+                <TextInput
+                  style={styles.input}
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder="Ton nom"
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
+            )}
+
+            {step === 2 && (
+              <View>
+                <Text style={styles.emoji}>🌸</Text>
+                <Text style={styles.title}>Ton intensité préférée</Text>
+                <Text style={styles.subtitle}>
+                  Quelle intensité correspond le mieux à ta personnalité ?
+                </Text>
+                {INTENSITY_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[styles.optionCard, intensity === option.value && styles.optionCardActive]}
+                    onPress={() => setIntensity(option.value)}
+                  >
+                    <Text style={styles.optionEmoji}>{option.emoji}</Text>
+                    <View style={styles.optionText}>
+                      <Text style={[styles.optionLabel, intensity === option.value && styles.optionLabelActive]}>
+                        {option.label}
+                      </Text>
+                      <Text style={styles.optionDesc}>{option.desc}</Text>
+                    </View>
+                    {intensity === option.value && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {step === 3 && (
+              <View>
+                <Text style={styles.emoji}>🗓️</Text>
+                <Text style={styles.title}>Ta saison préférée</Text>
+                <Text style={styles.subtitle}>
+                  On adaptera les recommandations à ta saison favorite.
+                </Text>
+                <View style={styles.seasonGrid}>
+                  {SEASON_OPTIONS.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[styles.seasonCard, season === option.value && styles.seasonCardActive]}
+                      onPress={() => setSeason(option.value)}
+                    >
+                      <Text style={styles.seasonEmoji}>{option.emoji}</Text>
+                      <Text style={[styles.seasonLabel, season === option.value && styles.seasonLabelActive]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+          </Animated.View>
+
+          <TouchableOpacity
+            style={[styles.button, !canProceed() && styles.buttonDisabled]}
+            onPress={step < STEPS ? goNext : handleFinish}
+            disabled={!canProceed() || saving}
+          >
+            <Text style={styles.buttonText}>
+              {saving ? "Enregistrement..." : step < STEPS ? "Continuer →" : "Commencer l'aventure 🚀"}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
 
     const displayName = user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email;
     const avatarLetter = user?.first_name?.charAt(0).toUpperCase() ?? user?.email?.charAt(0).toUpperCase(); 
@@ -334,4 +515,133 @@ const styles = StyleSheet.create({
     fontWeight: "bold", 
     fontSize: 15 
 },
+  onboardingContainer: { 
+    padding: 24, 
+    paddingTop: 80, 
+    paddingBottom: 40, 
+    flexGrow: 1 
+},
+  progressContainer: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    gap: 8, 
+    marginBottom: 48 
+  },
+  progressDot: { 
+    width: 8, 
+    height: 8, 
+    borderRadius: 4, 
+    backgroundColor: theme.colors.textMuted 
+  },
+  progressDotActive: { 
+    backgroundColor: theme.colors.gold 
+  },
+  progressDotCurrent: { 
+    width: 24, 
+    backgroundColor: theme.colors.gold 
+  },
+  title: { 
+    fontSize: 26, 
+    fontWeight: "bold", 
+    color: theme.colors.textPrimary, 
+    textAlign: "center", 
+    marginBottom: 10 
+  },
+  subtitle: { 
+    fontSize: 14, 
+    color: theme.colors.textSecondary, 
+    textAlign: "center", 
+    lineHeight: 22, 
+    marginBottom: 32 
+  },
+  emoji: { 
+    fontSize: 56, 
+    textAlign: "center", 
+    marginBottom: 16 
+  },
+  optionCard: { 
+    backgroundColor: theme.colors.card, 
+    borderRadius: theme.radius.md, 
+    padding: 16, 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 12, 
+    borderWidth: 1, 
+    borderColor: "rgba(201, 168, 76, 0.15)", 
+    gap: 14 
+  },
+  optionCardActive: { 
+    borderColor: theme.colors.gold, 
+    backgroundColor: "rgba(201, 168, 76, 0.08)" 
+  },
+  optionEmoji: { 
+    fontSize: 28 
+  },
+  optionText: { 
+    flex: 1 
+  },
+  optionLabel: { 
+    fontSize: 15, 
+    fontWeight: "600", 
+    color: theme.colors.textPrimary 
+  },
+  optionLabelActive: { 
+    color: theme.colors.gold 
+  },
+  optionDesc: { 
+    fontSize: 12, 
+    color: theme.colors.textSecondary, 
+    marginTop: 2 
+  },
+  checkmark: { 
+    fontSize: 18, 
+    color: theme.colors.gold, 
+    fontWeight: "bold" 
+  },
+  seasonGrid: { 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    gap: 12, 
+    justifyContent: "center" 
+  },
+  seasonCard: { 
+    width: "45%", 
+    backgroundColor: theme.colors.card, 
+    borderRadius: theme.radius.lg, 
+    padding: 24, 
+    alignItems: "center", 
+    borderWidth: 1, 
+    borderColor: "rgba(201, 168, 76, 0.15)", 
+    gap: 8 
+  },
+  seasonCardActive: { 
+    borderColor: theme.colors.gold, 
+    backgroundColor: "rgba(201, 168, 76, 0.08)" 
+  },
+  seasonEmoji: { 
+    fontSize: 36 
+  },
+  seasonLabel: { 
+    fontSize: 14, 
+    fontWeight: "600", 
+    color: theme.colors.textPrimary 
+  },
+  seasonLabelActive: { 
+    color: theme.colors.gold 
+  },
+  button: { 
+    backgroundColor: theme.colors.gold, 
+    padding: 16, 
+    borderRadius: theme.radius.md, 
+    alignItems: "center", 
+    marginTop: 32 
+  },
+  buttonDisabled: { 
+    opacity: 0.4 
+  },
+  buttonText: { 
+    color: theme.colors.background, 
+    fontWeight: "bold", 
+    fontSize: 16 
+  },
 });
