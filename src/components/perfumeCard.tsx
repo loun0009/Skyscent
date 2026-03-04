@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { Perfume } from "../types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { theme } from "../theme";
 
 
@@ -23,6 +23,7 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const intensity = intensityConfig[perfume.intensity];
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -44,7 +45,13 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
     return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateX: slideAnim }],}}>
       <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)} activeOpacity={0.8}>
-        <Image source={{ uri: perfume.image_url }} style={styles.image} />
+        <View style={styles.imageContainer}>
+          <Image source={imageError || !perfume.image_url ? require("../../assets/adaptative_logo.png") : { uri: perfume.image_url }}
+            style={styles.image}
+            resizeMode="cover" 
+            onError={() => setImageError(true)} 
+          />
+        </View>
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.titleBlock}>
@@ -94,9 +101,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#c9a84c26",
   },
+  imageContainer: {
+    width: 110,
+    height: 110,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+},
   image: { 
     width: 110, 
-    height: 110 
+    height: 110,
+    resizeMode: "contain", 
   },
   content: { 
     flex: 1, 
