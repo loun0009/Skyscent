@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Animated, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchPerfumeById } from "../../src/services/perfumesApi";
@@ -9,6 +9,8 @@ import { useHistory } from "../../src/context/HistoryContext";
 import { useWeather } from "../../src/hooks/useWeather";
 import { useFavorites } from "../../src/context/FavoritesContext";
 import { getRecommendations } from "../../src/utils/recommendations";
+import { useReviews } from "../../src/context/ReviewsContext";
+import { StarRating } from "../../src/components/starRating";
 
 const SEASON_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
   spring: { emoji: "🌱", label: "Printemps", color: "rgba(76, 175, 80, 0.2)" },
@@ -35,11 +37,36 @@ export default function PerfumeDetailScreen() {
   const [justAdded, setJustAdded] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(40)).current;
+  const { reviews, userReview, rating, loading: reviewsLoading, loadReviews, submitReview, removeReview } = useReviews();
+  const [reviewRating, setReviewRating] = useState(userReview?.rating ?? 0);
+  const [reviewComment, setReviewComment] = useState(userReview?.comment ?? "");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleWorn = async () => {
     if (!perfume || alreadyWornToday) return;
     await addEntry(perfume.id, weather?.temperature ?? null, weather?.condition ?? null, weather?.city ?? null);
     setJustAdded(true);
+  };
+
+  useEffect(() => {
+    if (perfume) 
+      loadReviews(perfume.id);
+    }, [perfume]);
+  
+  const handleSubmitReview = async () => {
+    if (!perfume || reviewRating === 0) return;
+    setSubmitting(true);
+    await submitReview(perfume.id, reviewRating, reviewComment || null);
+    setSubmitting(false);
+    setShowReviewForm(false);
+  };
+
+  const handleDeleteReview = async () => {
+    if (!perfume) return;
+    await removeReview(perfume.id);
+    setReviewRating(0);
+    setReviewComment("");
   };
 
   useEffect(() => {
@@ -204,6 +231,130 @@ export default function PerfumeDetailScreen() {
             ))}
           </View>
         </View>
+        {/* Note moyenne */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Avis de la communauté</Text>
+
+          {/* Résumé note */}
+          <View style={styles.ratingRow}>
+            <Text style={styles.ratingAverage}>
+              {rating && rating.count > 0 ? rating.average.toFixed(1) : "—"}
+            </Text>
+            <View>
+              <StarRating rating={rating?.average ?? 0} size={18} readonly />
+              <Text style={styles.ratingCount}>
+                {rating?.count ?? 0} avis
+              </Text>
+            </View>
+          </View>
+
+          {/* Mon avis */}
+          {userReview && !showReviewForm ? (
+            <View style={styles.myReviewCard}>
+              <View style={styles.myReviewHeader}>
+                <Text style={styles.myReviewTitle}>Mon avis</Text>
+                <View style={styles.myReviewActions}>
+                  <TouchableOpacity onPress={() => {
+                    setReviewRating(userReview.rating);
+                    setReviewComment(userReview.comment ?? "");
+                    setShowReviewForm(true);
+                  }}>
+                    <Text style={styles.editReviewText}>✏️ Modifier</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleDeleteReview}>
+                    <Text style={styles.deleteReviewText}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <StarRating rating={userReview.rating} size={16} readonly />
+              {userReview.comment && (
+                <Text style={styles.myReviewComment}>{userReview.comment}</Text>
+              )}
+            </View>
+          ) : !userReview && !showReviewForm ? (
+            <TouchableOpacity
+              style={styles.addReviewButton}
+              onPress={() => setShowReviewForm(true)}
+            >
+              <Text style={styles.addReviewText}>✍️ Laisser un avis</Text>
+            </TouchableOpacity>
+          ) : null}
+
+          {/* Formulaire avis */}
+          {showReviewForm && (
+            <View style={styles.reviewForm}>
+              <Text style={styles.reviewFormTitle}>
+                {userReview ? "Modifier mon avis" : "Mon avis"}
+              </Text>
+              <StarRating
+                rating={reviewRating}
+                size={32}
+                onRate={setReviewRating}
+              />
+              <TextInput
+                style={styles.reviewInput}
+                placeholder="Ajouter un commentaire... (optionnel)"
+                placeholderTextColor={theme.colors.textMuted}
+                value={reviewComment}
+                onChangeText={setReviewComment}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+              <View style={styles.reviewFormActions}>
+                <TouchableOpacity
+                  style={styles.cancelReviewButton}
+                  onPress={() => setShowReviewForm(false)}
+                >
+                  <Text style={styles.cancelReviewText}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.submitReviewButton, reviewRating === 0 && styles.submitDisabled]}
+                  onPress={handleSubmitReview}
+                  disabled={reviewRating === 0 || submitting}
+                >
+                  <Text style={styles.submitReviewText}>
+                    {submitting ? "Envoi..." : "Publier"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Liste des avis */}
+          {reviews.filter(r => r.user_id !== userReview?.user_id).map((review) => (
+            <View key={review.id} style={styles.reviewCard}>
+              <View style={styles.reviewCardHeader}>
+                <View style={styles.reviewAvatar}>
+                  <Text style={styles.reviewAvatarText}>
+                    {review.profile?.first_name?.charAt(0).toUpperCase() ?? "?"}
+                  </Text>
+                </View>
+                <View style={styles.reviewCardInfo}>
+                  <Text style={styles.reviewAuthor}>
+                    {review.profile?.first_name && review.profile?.last_name
+                      ? `${review.profile.first_name} ${review.profile.last_name}`
+                      : "Utilisateur"}
+                  </Text>
+                  <StarRating rating={review.rating} size={12} readonly />
+                </View>
+                <Text style={styles.reviewDate}>
+                  {new Date(review.created_at).toLocaleDateString("fr-FR", {
+                    day: "numeric", month: "short"
+                  })}
+                </Text>
+              </View>
+              {review.comment && (
+                <Text style={styles.reviewComment}>{review.comment}</Text>
+              )}
+            </View>
+          ))}
+
+          {reviews.length === 0 && !userReview && (
+            <Text style={styles.noReviews}>Aucun avis pour l'instant. Sois le premier !</Text>
+          )}
+        </View>
+
 
         {/* Bouton porté discret */}
         <TouchableOpacity
@@ -492,5 +643,191 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary, 
     fontSize: 14, 
     fontWeight: "600" 
+  },
+
+   // Rating
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginBottom: 16,
+    backgroundColor: theme.colors.card,
+    padding: 14,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: "#c9a84c26",
+  },
+  ratingAverage: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: theme.colors.textPrimary,
+  },
+  ratingCount: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+
+  // Mon avis
+  myReviewCard: {
+    backgroundColor: "#c9a84c14",
+    borderRadius: theme.radius.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#c9a84c4d",
+    marginBottom: 12,
+    gap: 8,
+  },
+  myReviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  myReviewTitle: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: theme.colors.gold,
+  },
+  myReviewActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  editReviewText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  deleteReviewText: {
+    fontSize: 14,
+  },
+  myReviewComment: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+    marginTop: 4,
+  },
+
+  // Bouton ajouter avis
+  addReviewButton: {
+    borderWidth: 1,
+    borderColor: "#c9a84c4d",
+    borderStyle: "dashed",
+    borderRadius: theme.radius.md,
+    padding: 14,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  addReviewText: {
+    color: theme.colors.gold,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  // Formulaire avis
+  reviewForm: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#c9a84c33",
+    marginBottom: 16,
+    gap: 12,
+  },
+  reviewFormTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: theme.colors.textPrimary,
+  },
+  reviewInput: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.sm,
+    padding: 12,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    borderWidth: 1,
+    borderColor: "#c9a84c26",
+    minHeight: 80,
+  },
+  reviewFormActions: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  cancelReviewButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.textMuted,
+    alignItems: "center",
+  },
+  cancelReviewText: {
+    color: theme.colors.textSecondary,
+    fontWeight: "600",
+  },
+  submitReviewButton: {
+    flex: 2,
+    padding: 12,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.gold,
+    alignItems: "center",
+  },
+  submitDisabled: {
+    opacity: 0.4,
+  },
+  submitReviewText: {
+    color: theme.colors.background,
+    fontWeight: "bold",
+  },
+
+  // Cartes avis communauté
+  reviewCard: {
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#c9a84c1a",
+    gap: 8,
+  },
+  reviewCardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  reviewAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: theme.colors.gold,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  reviewAvatarText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: theme.colors.background,
+  },
+  reviewCardInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  reviewAuthor: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textPrimary,
+  },
+  reviewDate: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  reviewComment: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+  },
+  noReviews: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    textAlign: "center",
+    paddingVertical: 16,
   },
 });
