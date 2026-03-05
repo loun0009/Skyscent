@@ -10,6 +10,7 @@ interface Props {
     isFavorite?: boolean;
     onToggleFavorite?: (id: number) => void;
     index?: number;
+    rating?: { average: number; count: number };
 }
 
 const intensityConfig = {
@@ -18,7 +19,7 @@ const intensityConfig = {
   "intense": { color: theme.colors.intensityStrong, dot: "#F44336" },
 };
 
-export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite, index = 0 }: Props) => {
+export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite, index = 0, rating }: Props) => {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -57,6 +58,11 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
             <View style={styles.titleBlock}>
               <Text style={styles.name} numberOfLines={1}>{perfume.name}</Text>
               <Text style={styles.brand}>{perfume.brand}</Text>
+              {rating && rating.count > 0 && (
+                <Text style={styles.rating}>
+                  ⭐ {rating.average.toFixed(1)} ({rating.count})
+                </Text>
+              )}
             </View>
             <View style={styles.actions}>
               <View style={[styles.badge, { backgroundColor: intensity.color }]}>
@@ -193,5 +199,10 @@ const styles = StyleSheet.create({
     fontSize: 10, 
     color: theme.colors.textMuted, 
     alignSelf: "center" 
+  },
+  rating: {
+    fontSize: 11,
+    color: theme.colors.gold,
+    marginTop: 2,
   },
 });
