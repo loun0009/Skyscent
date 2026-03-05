@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "../src/context/AuthContext";
 import { theme } from "../src/theme";
 import { HistoryProvider } from "../src/context/HistoryContext";
 import { ReviewsProvider } from "../src/context/ReviewsContext";
+import { CollectionProvider } from "../src/context/CollectionContext";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -31,89 +32,91 @@ export default function RootLayout() {
       <FavoritesProvider>
         <HistoryProvider>
           <ReviewsProvider>
-            <AuthGuard>
-            <Tabs
-              screenOptions={{
-                headerShown: false,
-                tabBarStyle: {
-                  backgroundColor: theme.colors.surface,
-                  borderTopColor: "#c9a84c26",
-                  height: 60,
-                  paddingBottom: 8,
-                },
-                tabBarActiveTintColor: theme.colors.gold,
-                tabBarInactiveTintColor: theme.colors.textMuted,
-                tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
-              }}
-            >
-              <Tabs.Screen
-                name="index"
-                options={{
-                  title: "Accueil",
-                  tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color }}>🏠</Text>
-                  ),
+            <CollectionProvider>
+              <AuthGuard>
+              <Tabs
+                screenOptions={{
+                  headerShown: false,
+                  tabBarStyle: {
+                    backgroundColor: theme.colors.surface,
+                    borderTopColor: "#c9a84c26",
+                    height: 60,
+                    paddingBottom: 8,
+                  },
+                  tabBarActiveTintColor: theme.colors.gold,
+                  tabBarInactiveTintColor: theme.colors.textMuted,
+                  tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
                 }}
-              />
-              <Tabs.Screen
-                name="catalog"
-                options={{
-                  title: "Catalogue",
-                  tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color }}>🌸</Text>
-                  ),
+              >
+                <Tabs.Screen
+                  name="index"
+                  options={{
+                    title: "Accueil",
+                    tabBarIcon: ({ color }) => (
+                      <Text style={{ fontSize: 20, color }}>🏠</Text>
+                    ),
+                  }}
+                />
+                <Tabs.Screen
+                  name="catalog"
+                  options={{
+                    title: "Catalogue",
+                    tabBarIcon: ({ color }) => (
+                      <Text style={{ fontSize: 20, color }}>🌸</Text>
+                    ),
+                  }}
+                />
+                <Tabs.Screen
+                  name="favorites"
+                  options={{
+                    href: null,
+                  }}
+                />
+                <Tabs.Screen
+                  name="history"
+                  options={{
+                    href: null,
                 }}
-              />
-              <Tabs.Screen
-                name="favorites"
-                options={{
-                  href: null,
-                }}
-              />
-              <Tabs.Screen
-                name="history"
-                options={{
-                  href: null,
-              }}
-              />
-              <Tabs.Screen
-                name="map"
-                options={{
-                  title: "Carte",
-                  tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color }}>🗺️</Text>
-                  ),
-                }}
-              />
-              <Tabs.Screen
-                name="profile"
-                options={{
-                  title: "Profil",
-                  tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color }}>👤</Text>
-                  ),
-                }}
-              />
-              <Tabs.Screen
-                name="settings"
-                options={{
-                  href: null,
-                }}
-              />
-              <Tabs.Screen
-                name="auth"
-                options={{ href: null}}
-              />
-              <Tabs.Screen
-                name="perfume/[id]"
-                options={{ href: null }}
-              />
-              <Tabs.Screen
-                name="stats"
-                options={{ href: null }}
-              />
-            </Tabs>
-            </AuthGuard>
+                />
+                <Tabs.Screen
+                  name="map"
+                  options={{
+                    title: "Carte",
+                    tabBarIcon: ({ color }) => (
+                      <Text style={{ fontSize: 20, color }}>🗺️</Text>
+                    ),
+                  }}
+                />
+                <Tabs.Screen
+                  name="profile"
+                  options={{
+                    title: "Profil",
+                    tabBarIcon: ({ color }) => (
+                      <Text style={{ fontSize: 20, color }}>👤</Text>
+                    ),
+                  }}
+                />
+                <Tabs.Screen
+                  name="settings"
+                  options={{
+                    href: null,
+                  }}
+                />
+                <Tabs.Screen
+                  name="auth"
+                  options={{ href: null}}
+                />
+                <Tabs.Screen
+                  name="perfume/[id]"
+                  options={{ href: null }}
+                />
+                <Tabs.Screen
+                  name="stats"
+                  options={{ href: null }}
+                />
+              </Tabs>
+              </AuthGuard>
+            </CollectionProvider>  
           </ReviewsProvider>
         </HistoryProvider>
       </FavoritesProvider>
