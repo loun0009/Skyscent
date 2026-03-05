@@ -63,3 +63,22 @@ export interface HistoryEntry {
     city: string | null;
     perfume: Perfume;
 }
+
+export interface Review {
+    id: number;
+    user_id: string;
+    perfume_id: number;
+    rating: number; // 1 à 5
+    comment: string | null;
+    created_at: string;
+    updated_at: string;
+    profile?: {
+        first_name: string | null;
+        last_name: string | null;
+    };
+}
+
+export interface PerfumeRating {
+    average: number;
+    count: number;
+}
