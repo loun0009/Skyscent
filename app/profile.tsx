@@ -260,7 +260,17 @@ export default function ProfileScreen() {
                 <Text style={styles.shortcutEmoji}>❤️</Text>
                 <Text style={styles.shortcutLabel}>Favoris</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => router.push("/stats")}
+              >
+                <Text style={styles.shortcutEmoji}>📊</Text>
+                <Text style={styles.shortcutLabel}>Stats</Text>
+              </TouchableOpacity>
             </View>
+
+            
 
             {/* Infos profil */}
             <View style={styles.card}>
@@ -423,7 +433,7 @@ const styles = StyleSheet.create({
     borderRadius: 16, 
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000", 
+    shadowColor: "#000000", 
     shadowOffset: { 
         width: 0, 
         height: 2 
@@ -594,12 +604,12 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     marginBottom: 12, 
     borderWidth: 1, 
-    borderColor: "rgba(201, 168, 76, 0.15)", 
+    borderColor: "#c9a84c26", 
     gap: 14 
   },
   optionCardActive: { 
     borderColor: theme.colors.gold, 
-    backgroundColor: "rgba(201, 168, 76, 0.08)" 
+    backgroundColor: "#c9a84c14" 
   },
   optionEmoji: { 
     fontSize: 28 
@@ -638,12 +648,12 @@ const styles = StyleSheet.create({
     padding: 24, 
     alignItems: "center", 
     borderWidth: 1, 
-    borderColor: "rgba(201, 168, 76, 0.15)", 
+    borderColor: "#c9a84c26", 
     gap: 8 
   },
   seasonCardActive: { 
     borderColor: theme.colors.gold, 
-    backgroundColor: "rgba(201, 168, 76, 0.08)" 
+    backgroundColor: "#c9a84c14" 
   },
   seasonEmoji: { 
     fontSize: 36 
@@ -684,13 +694,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.15)",
+    borderColor: "#c9a84c26",
   },
   shortcutEmoji: {
     fontSize: 24,
   },
   shortcutLabel: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },

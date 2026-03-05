@@ -108,6 +108,10 @@ export default function RootLayout() {
                 name="perfume/[id]"
                 options={{ href: null }}
               />
+              <Tabs.Screen
+                name="stats"
+                options={{ href: null }}
+              />
             </Tabs>
             </AuthGuard>
           </ReviewsProvider>
