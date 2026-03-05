@@ -11,6 +11,7 @@ import { useFavorites } from "../../src/context/FavoritesContext";
 import { getRecommendations } from "../../src/utils/recommendations";
 import { useReviews } from "../../src/context/ReviewsContext";
 import { StarRating } from "../../src/components/starRating";
+import { useCollection } from "../../src/context/CollectionContext";
 
 const SEASON_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
   spring: { emoji: "🌱", label: "Printemps", color: "rgba(76, 175, 80, 0.2)" },
@@ -42,6 +43,10 @@ export default function PerfumeDetailScreen() {
   const [reviewComment, setReviewComment] = useState(userReview?.comment ?? "");
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { isInCollection, toggleCollection } = useCollection();
+
+
+  const inCollection = perfume ? isInCollection(perfume.id) : false;
 
   const handleWorn = async () => {
     if (!perfume || alreadyWornToday) return;
@@ -139,6 +144,15 @@ export default function PerfumeDetailScreen() {
 
         {/* Nom sur l'image */}
         <View style={styles.imageOverlayContent}>
+          {/* Bouton collection */}
+        <TouchableOpacity
+          style={[styles.collectionButton, inCollection && styles.collectionButtonActive]}
+          onPress={() => toggleCollection(perfume.id)}
+        >
+          <Text style={styles.collectionButtonText}>
+            {inCollection ? "💎 Dans ma collection" : "➕ Ajouter à ma collection"}
+          </Text>
+        </TouchableOpacity>
           <Text style={styles.brand}>{perfume.brand}</Text>
           <Text style={styles.name}>{perfume.name}</Text>
         </View>
@@ -829,5 +843,23 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     textAlign: "center",
     paddingVertical: 16,
+  },
+  collectionButton: {
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#c9a84c4d",
+  },
+  collectionButtonActive: {
+    backgroundColor: "#c9a84c1a",
+    borderColor: theme.colors.gold,
+  },
+  collectionButtonText: {
+    fontSize: 13,
+    color: theme.colors.gold,
+    fontWeight: "600",
   },
 });
