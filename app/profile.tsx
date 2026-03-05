@@ -3,9 +3,12 @@ import { useAuth } from "../src/context/AuthContext";
 import { useRef, useState } from "react";
 import { theme } from "../src/theme";
 import { router } from "expo-router/build/exports";
+import { useCollection } from "../src/context/CollectionContext";
+import { usePerfumes } from "../src/hooks/usePerfumes";
+import { Image, FlatList } from "react-native";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
-const STEPS = 3;
+const STEPS = 4;
 
 const INTENSITY_OPTIONS = [
   { value: "légère", label: "Légère", emoji: "🌸", desc: "Discrète et fraîche" },
@@ -22,29 +25,38 @@ const SEASON_OPTIONS = [
 
 
 export default function ProfileScreen() {
-    const { user, signOut, updateUserProfile } = useAuth();
-    const [editing, setEditing] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [firstName, setFirstName] = useState(user?.first_name ?? "");
-    const [lastName, setLastName] = useState(user?.last_name ?? "");
-    const [age, setAge] = useState(user?.age?.toString() ?? "");
-    const [gender, setGender] = useState<"homme" | "femme" | "autre" | null>( user?.gender ?? null );
-    const [step, setStep] = useState(1);
-    const [intensity, setIntensity] = useState<"légère" | "modérée" | "intense" | null>(null);
-    const [season, setSeason] = useState<"spring" | "summer" | "autumn" | "winter" | null>(null);
-    const fadeAnim = useRef(new Animated.Value(1)).current;
-    const slideAnim = useRef(new Animated.Value(0)).current;
+  const { user, signOut, updateUserProfile } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [firstName, setFirstName] = useState(user?.first_name ?? "");
+  const [lastName, setLastName] = useState(user?.last_name ?? "");
+  const [age, setAge] = useState(user?.age?.toString() ?? "");
+  const [gender, setGender] = useState<"homme" | "femme" | "autre" | null>( user?.gender ?? null );
+  const [step, setStep] = useState(1);
+  const [intensity, setIntensity] = useState<"légère" | "modérée" | "intense" | null>(null);
+  const [season, setSeason] = useState<"spring" | "summer" | "autumn" | "winter" | null>(null);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const { addMany } = useCollection();
+  const { perfumes } = usePerfumes(null);
+  const [selectedPerfumes, setSelectedPerfumes] = useState<number[]>([]);
 
-    const animateStep = () => {
+  const toggleSelectPerfume = (id: number) => {
+    setSelectedPerfumes((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    );
+  };
+
+  const animateStep = () => {
     Animated.sequence([
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: -30, duration: 200, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
-      ]),
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: -30, duration: 200, useNativeDriver: true }),
+    ]),
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+    ]),
     ]).start();
   };
 
@@ -57,41 +69,45 @@ export default function ProfileScreen() {
     if (step === 1) return firstName.trim().length > 0 && lastName.trim().length > 0;
     if (step === 2) return intensity !== null;
     if (step === 3) return season !== null;
+    if (step === 4) return true; // Pas de condition, c'est juste pour ajouter des parfums à la collection (optionnel)
     return false;
   };
 
   const handleFinish = async () => {
+  setSaving(true);
+  await updateUserProfile({
+    first_name: firstName.trim(),
+    last_name: lastName.trim(),
+    preferred_intensity: intensity ?? undefined,
+    preferred_season: season ?? undefined,
+    onboarding_completed: true,
+  });
+  if (selectedPerfumes.length > 0) {
+    await addMany(selectedPerfumes);
+  }
+  setSaving(false);
+};
+
+
+
+
+  const handleSave = async () => {
     setSaving(true);
     await updateUserProfile({
-      first_name: firstName.trim(),
-      last_name: lastName.trim(),
-      preferred_intensity: intensity ?? undefined,
-      preferred_season: season ?? undefined,
-      onboarding_completed: true,
+      first_name: firstName,
+      last_name: lastName,
+      age: age ? parseInt(age) : undefined,
+      gender: gender ?? undefined
     });
     setSaving(false);
+    setEditing(false);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
-
-
-    const handleSave = async () => {
-        setSaving(true);
-        await updateUserProfile({
-            first_name: firstName,
-            last_name: lastName,
-            age: age ? parseInt(age) : undefined,
-            gender: gender ?? undefined
-        });
-        setSaving(false);
-        setEditing(false);
-    };
-
-    const handleSignOut = async () => {
-        await signOut();
-    };
-
-    if (!user?.onboarding_completed) {
+  if (!user?.onboarding_completed) {
     return (
       <KeyboardAvoidingView
         style={styles.wrapper}
@@ -196,6 +212,56 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
+            {step === 4 && (
+            <View>
+              <Text style={styles.emoji}>💎</Text>
+              <Text style={styles.title}>Ta collection</Text>
+              <Text style={styles.subtitle}>
+                Sélectionne les parfums que tu possèdes déjà.{"\n"}
+                Tu pourras en ajouter d'autres plus tard.
+              </Text>
+              <Text style={styles.collectionCount}>
+                {selectedPerfumes.length} sélectionné{selectedPerfumes.length > 1 ? "s" : ""}
+              </Text>
+              <FlatList
+                data={perfumes}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                scrollEnabled={false}
+                columnWrapperStyle={styles.collectionRow}
+                contentContainerStyle={styles.collectionGrid}
+                renderItem={({ item }) => {
+                  const selected = selectedPerfumes.includes(item.id);
+                  return (
+                    <TouchableOpacity
+                      style={[styles.collectionCard, selected && styles.collectionCardActive]}
+                      onPress={() => toggleSelectPerfume(item.id)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.collectionImageContainer}>
+                        <Image
+                          source={{ uri: item.image_url }}
+                          style={styles.collectionImage}
+                          resizeMode="contain"
+                        />
+                        {selected && (
+                          <View style={styles.collectionCheckOverlay}>
+                            <Text style={styles.collectionCheck}>✓</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.collectionName} numberOfLines={1}>
+                        {item.name}
+                      </Text>
+                      <Text style={styles.collectionBrand} numberOfLines={1}>
+                        {item.brand}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+          )}
           </Animated.View>
 
           <TouchableOpacity
@@ -212,28 +278,28 @@ export default function ProfileScreen() {
     );
   }
 
-    const displayName = user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email;
-    const avatarLetter = user?.first_name?.charAt(0).toUpperCase() ?? user?.email?.charAt(0).toUpperCase(); 
+  const displayName = user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.email;
+  const avatarLetter = user?.first_name?.charAt(0).toUpperCase() ?? user?.email?.charAt(0).toUpperCase(); 
 
-    return (
-        <View style={styles.wrapper}>
-            <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.headline}>Mon profil 👤</Text>
+  return (
+    <View style={styles.wrapper}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.headline}>Mon profil 👤</Text>
 
-            {/* Avatar */}
-            <View style={styles.avatarSection}>
-                <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>{avatarLetter}</Text>
-                </View>
-                <Text style={styles.displayName}>{displayName}</Text>
-                <Text style={styles.email}>{user?.email}</Text>
-                <Text style={styles.since}>
-                    Membre depuis{" "}
-                    {new Date(user?.created_at ?? "").toLocaleDateString("fr-FR", {
+          {/* Avatar */}
+          <View style={styles.avatarSection}>
+            <View style={styles.avatar}>
+               <Text style={styles.avatarText}>{avatarLetter}</Text>
+            </View>
+              <Text style={styles.displayName}>{displayName}</Text>
+              <Text style={styles.email}>{user?.email}</Text>
+              <Text style={styles.since}>
+                  Membre depuis{" "}
+                  {new Date(user?.created_at ?? "").toLocaleDateString("fr-FR", {
                     month: "long",
                     year: "numeric",
-                    })}
-                </Text>
+                  })}
+              </Text>
             </View>
             {/* Raccourcis */}
             <View style={styles.shortcutsRow}>
@@ -243,14 +309,6 @@ export default function ProfileScreen() {
               >
                 <Text style={styles.shortcutEmoji}>📖</Text>
                 <Text style={styles.shortcutLabel}>Historique</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.shortcutCard}
-                onPress={() => router.push("/settings")}
-              >
-                <Text style={styles.shortcutEmoji}>⚙️</Text>
-                <Text style={styles.shortcutLabel}>Paramètres</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -268,110 +326,118 @@ export default function ProfileScreen() {
                 <Text style={styles.shortcutEmoji}>📊</Text>
                 <Text style={styles.shortcutLabel}>Stats</Text>
               </TouchableOpacity>
+
+                            <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => router.push("/settings")}
+              >
+                <Text style={styles.shortcutEmoji}>⚙️</Text>
+                <Text style={styles.shortcutLabel}>Paramètres</Text>
+              </TouchableOpacity>
             </View>
 
             
 
             {/* Infos profil */}
             <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>Informations personnelles</Text>
-                        {!editing && (
-                            <TouchableOpacity onPress={() => setEditing(true)}>
-                                <Text style={styles.editButton}>✏️ Modifier</Text>
-                            </TouchableOpacity>
-                        )}
-                </View>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Informations personnelles</Text>
+                  {!editing && (
+                    <TouchableOpacity onPress={() => setEditing(true)}>
+                      <Text style={styles.editButton}>✏️ Modifier</Text>
+                    </TouchableOpacity>
+                  )}
+              </View>
 
-                {editing ? (
-                    <>
-                    <Text style={styles.label}>Prénom</Text>
+              {editing ? (
+                <>
+                  <Text style={styles.label}>Prénom</Text>
                     <TextInput
-                        style={styles.input}
-                        value={firstName}
-                        onChangeText={setFirstName}
-                        placeholder="Ton prénom"
-                        placeholderTextColor={theme.colors.textSecondary}
+                      style={styles.input}
+                      value={firstName}
+                      onChangeText={setFirstName}
+                      placeholder="Ton prénom"
+                      placeholderTextColor={theme.colors.textSecondary}
                     />
 
-                    <Text style={styles.label}>Nom</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={lastName}
-                        onChangeText={setLastName}
-                        placeholder="Ton nom"
-                        placeholderTextColor={theme.colors.textSecondary}
-                    />
+                  <Text style={styles.label}>Nom</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={lastName}
+                    onChangeText={setLastName}
+                    placeholder="Ton nom"
+                    placeholderTextColor={theme.colors.textSecondary}
+                  />
 
-                    <Text style={styles.label}>Âge</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={age}
-                        onChangeText={setAge}
-                        placeholder="Ton âge"
-                        placeholderTextColor={theme.colors.textSecondary}
-                        keyboardType="numeric"
-                        maxLength={3}
-                    />
+                  <Text style={styles.label}>Âge</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={age}
+                    onChangeText={setAge}
+                    placeholder="Ton âge"
+                    placeholderTextColor={theme.colors.textSecondary}
+                    keyboardType="numeric"
+                    maxLength={3}
+                  />
 
-                    <Text style={styles.label}>Genre</Text>
-                    <View style={styles.genderRow}>
-                        {GENDER_OPTIONS.map((g) => (
-                            <TouchableOpacity key={g} style={[styles.genderPill,gender === g && styles.genderPillActive]} onPress={() => setGender(g)}>
-                                <Text style={[styles.genderText, gender === g && styles.genderTextActive]}> 
-                                    {g.charAt(0).toUpperCase() + g.slice(1)}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                  <Text style={styles.label}>Genre</Text>
+                  <View style={styles.genderRow}>
+                    {GENDER_OPTIONS.map((g) => (
+                      <TouchableOpacity key={g} style={[styles.genderPill,gender === g && styles.genderPillActive]} onPress={() => setGender(g)}>
+                        <Text style={[styles.genderText, gender === g && styles.genderTextActive]}> 
+                          {g.charAt(0).toUpperCase() + g.slice(1)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
 
-                    <View style={styles.editActions}>
-                        <TouchableOpacity style={styles.cancelButton} onPress={() => setEditing(false)}>
-                            <Text style={styles.cancelText}>Annuler</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
-                            {saving ? (<ActivityIndicator color={theme.colors.card} size="small" />
-                            ) : (<Text style={styles.saveText}>Enregistrer</Text>)}
-                        </TouchableOpacity>
-                    </View>
-                    </>
+                  <View style={styles.editActions}>
+                    <TouchableOpacity style={styles.cancelButton} onPress={() => setEditing(false)}>
+                      <Text style={styles.cancelText}>Annuler</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
+                      {saving ? (<ActivityIndicator color={theme.colors.card} size="small" />
+                      ) : (<Text style={styles.saveText}>Enregistrer</Text>)}
+                    </TouchableOpacity>
+                  </View>
+                </>
                 ) : (
                 <>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Prénom</Text>
-                    <Text style={styles.infoValue}>
-                        {user?.first_name || "Non renseigné"}
-                    </Text>
+                  <Text style={styles.infoLabel}>Prénom</Text>
+                  <Text style={styles.infoValue}>
+                    {user?.first_name || "Non renseigné"}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Nom</Text>
-                    <Text style={styles.infoValue}>
-                        {user?.last_name || "Non renseigné"}
-                    </Text>
+                  <Text style={styles.infoLabel}>Nom</Text>
+                  <Text style={styles.infoValue}>
+                    {user?.last_name || "Non renseigné"}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Âge</Text>
-                    <Text style={styles.infoValue}>
-                        {user?.age ? `${user.age} ans` : "Non renseigné"}
-                    </Text>
+                  <Text style={styles.infoLabel}>Âge</Text>
+                  <Text style={styles.infoValue}>
+                    {user?.age ? `${user.age} ans` : "Non renseigné"}
+                  </Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Genre</Text>
-                    <Text style={styles.infoValue}>
-                        {user?.gender
-                        ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1)
-                        : "Non renseigné"}
-                    </Text>
+                  <Text style={styles.infoLabel}>Genre</Text>
+                  <Text style={styles.infoValue}>
+                    {user?.gender
+                    ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1)
+                    : "Non renseigné"}
+                  </Text>
                 </View>
                 </>
-                )}
+              )}
             </View>
 
             {/* Déconnexion */}
             <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-                <Text style={styles.signOutText}>Se déconnecter</Text>
+              <Text style={styles.signOutText}>Se déconnecter</Text>
             </TouchableOpacity>
-        </ScrollView>
+      </ScrollView>
     </View>
     );
 }
@@ -703,5 +769,66 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "600",
     color: theme.colors.textSecondary,
+  },
+  collectionCount: {
+    fontSize: 13,
+    color: theme.colors.gold,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  collectionGrid: {
+    gap: 10,
+  },
+  collectionRow: {
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 10,
+  },
+  collectionCard: {
+    width: "48%",
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.md,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#c9a84c26",
+  },
+  collectionCardActive: {
+    borderColor: theme.colors.gold,
+    backgroundColor: "#c9a84c14",
+  },
+  collectionImageContainer: {
+    width: "100%",
+    height: 100,
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  collectionImage: {
+    width: "100%",
+    height: 100,
+  },
+  collectionCheckOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#c9a84c4d",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  collectionCheck: {
+    fontSize: 32,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  collectionName: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: theme.colors.textPrimary,
+    padding: 8,
+    paddingBottom: 2,
+  },
+  collectionBrand: {
+    fontSize: 10,
+    color: theme.colors.gold,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
   },
 });
