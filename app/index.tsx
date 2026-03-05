@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Animated } from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Animated, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useWeather } from "../src/hooks/useWeather";
 import { usePerfumes } from "../src/hooks/usePerfumes";
@@ -13,6 +13,7 @@ import { useFavorites } from "../src/context/FavoritesContext";
 import { useEffect, useRef } from "react";
 import { theme } from "../src/theme";
 import { useAuth } from "../src/context/AuthContext";
+import { useCollection } from "../src/context/CollectionContext";
 
 
 export default function HomeScreen() {
@@ -24,11 +25,10 @@ export default function HomeScreen() {
   const { user } = useAuth();  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-20)).current;
+  const { collection } = useCollection();
 
+  const hasCollection = collection.length > 0;
 
-
-
-  // On applique les filtres sur les recommandations
   const filteredRecommendations = applyFilters(recommendations);
 
   useEffect(() => {
@@ -85,7 +85,6 @@ export default function HomeScreen() {
 
         {weather && <WeatherCard weather={weather} />}
 
-        {/* Barre de filtres */}
         <FilterBar
           filters={filters}
           perfumes={perfumes}
@@ -95,6 +94,40 @@ export default function HomeScreen() {
           onBrandChange={setBrand}
           onReset={resetFilters}
         />
+
+        {hasCollection && (
+          <View style={styles.collectionSection}>
+            <Text style={styles.collectionTitle}>Ma Collection 💎</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.collectionScroll}
+            >
+              {collection.map((perfume) => (
+                <TouchableOpacity
+                  key={perfume.id}
+                  style={styles.collectionItem}
+                  onPress={() => router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } })}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.collectionItemImage}>
+                    <Image
+                      source={{ uri: perfume.image_url }}
+                      style={{ width: 70, height: 70 }}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <Text style={styles.collectionItemName} numberOfLines={1}>
+                    {perfume.name}
+                  </Text>
+                  <Text style={styles.collectionItemBrand} numberOfLines={1}>
+                    {perfume.brand}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         <Text style={styles.sectionTitle}>
           {filteredRecommendations.length > 0
@@ -191,5 +224,47 @@ const styles = StyleSheet.create({
   footerText: { 
     fontSize: 12, 
     color: theme.colors.textMuted 
+  },
+  collectionSection: {
+    marginBottom: 24,
+  },
+  collectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: theme.colors.textPrimary,
+    marginBottom: 12,
+  },
+  collectionScroll: {
+    gap: 12,
+    paddingRight: 4,
+  },
+  collectionItem: {
+    width: 90,
+    alignItems: "center",
+    gap: 4,
+  },
+  collectionItemImage: {
+    width: 90,
+    height: 90,
+    backgroundColor: "#fff",
+    borderRadius: theme.radius.md,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#c9a84c33",
+    overflow: "hidden",
+  },
+  collectionItemName: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: theme.colors.textPrimary,
+    textAlign: "center",
+    width: 90,
+  },
+  collectionItemBrand: {
+    fontSize: 10,
+    color: theme.colors.gold,
+    textAlign: "center",
+    width: 90,
   },
 });
