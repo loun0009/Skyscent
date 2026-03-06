@@ -1,4 +1,4 @@
-import { Tabs, Redirect, useSegments } from "expo-router";
+import { Stack, Redirect, useSegments } from "expo-router";
 import { Text } from "react-native";
 import { FavoritesProvider } from "../src/context/FavoritesContext";
 import { AuthProvider, useAuth } from "../src/context/AuthContext";
@@ -34,89 +34,17 @@ export default function RootLayout() {
           <ReviewsProvider>
             <CollectionProvider>
               <AuthGuard>
-              <Tabs
-                screenOptions={{
-                  headerShown: false,
-                  tabBarStyle: {
-                    backgroundColor: theme.colors.surface,
-                    borderTopColor: "#c9a84c26",
-                    height: 60,
-                    paddingBottom: 8,
-                  },
-                  tabBarActiveTintColor: theme.colors.gold,
-                  tabBarInactiveTintColor: theme.colors.textMuted,
-                  tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
-                }}
-              >
-                <Tabs.Screen
-                  name="index"
-                  options={{
-                    title: "Accueil",
-                    tabBarIcon: ({ color }) => (
-                      <Text style={{ fontSize: 20, color }}>🏠</Text>
-                    ),
-                  }}
-                />
-                <Tabs.Screen
-                  name="catalog"
-                  options={{
-                    title: "Catalogue",
-                    tabBarIcon: ({ color }) => (
-                      <Text style={{ fontSize: 20, color }}>🌸</Text>
-                    ),
-                  }}
-                />
-                <Tabs.Screen
-                  name="favorites"
-                  options={{
-                    href: null,
-                  }}
-                />
-                <Tabs.Screen
-                  name="history"
-                  options={{
-                    href: null,
-                }}
-                />
-                <Tabs.Screen
-                  name="map"
-                  options={{
-                    title: "Carte",
-                    tabBarIcon: ({ color }) => (
-                      <Text style={{ fontSize: 20, color }}>🗺️</Text>
-                    ),
-                  }}
-                />
-                <Tabs.Screen
-                  name="profile"
-                  options={{
-                    title: "Profil",
-                    tabBarIcon: ({ color }) => (
-                      <Text style={{ fontSize: 20, color }}>👤</Text>
-                    ),
-                  }}
-                />
-                <Tabs.Screen
-                  name="settings"
-                  options={{
-                    href: null,
-                  }}
-                />
-                <Tabs.Screen
-                  name="auth"
-                  options={{ href: null}}
-                />
-                <Tabs.Screen
-                  name="perfume/[id]"
-                  options={{ href: null }}
-                />
-                <Tabs.Screen
-                  name="stats"
-                  options={{ href: null }}
-                />
-              </Tabs>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="auth" />
+                  <Stack.Screen name="perfume/[id]" />
+                  <Stack.Screen name="history" />
+                  <Stack.Screen name="favorites" />
+                  <Stack.Screen name="settings" />
+                  <Stack.Screen name="stats" />
+                </Stack>
               </AuthGuard>
-            </CollectionProvider>  
+            </CollectionProvider>
           </ReviewsProvider>
         </HistoryProvider>
       </FavoritesProvider>
