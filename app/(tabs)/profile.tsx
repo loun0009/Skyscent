@@ -1,10 +1,10 @@
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, ScrollView, Animated, KeyboardAvoidingView, Platform } from "react-native";
-import { useAuth } from "../src/context/AuthContext";
+import { useAuth } from "../../src/context/AuthContext";
 import { useRef, useState } from "react";
-import { theme } from "../src/theme";
+import { theme } from "../../src/theme";
 import { router } from "expo-router/build/exports";
-import { useCollection } from "../src/context/CollectionContext";
-import { usePerfumes } from "../src/hooks/usePerfumes";
+import { useCollection } from "../../src/context/CollectionContext";
+import { usePerfumes } from "../../src/hooks/usePerfumes";
 import { Image, FlatList } from "react-native";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;

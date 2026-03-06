@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Linking, Platform } from "react-native";
 import MapView, { Marker, Circle, PROVIDER_GOOGLE } from "react-native-maps";
 import { useState } from "react";
-import { useNearbyStores } from "../src/hooks/useNearByStores";
-import { PerfumeStore } from "../src/services/placesServices";
-import { theme } from "../src/theme";
+import { useNearbyStores } from "../../src/hooks/useNearByStores";
+import { PerfumeStore } from "../../src/services/placesServices";
+import { theme } from "../../src/theme";
 
 const RADIUS_OPTIONS = [
   { label: "500m", value: 500 },

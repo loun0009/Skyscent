@@ -1,19 +1,19 @@
 import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Animated, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { useWeather } from "../src/hooks/useWeather";
-import { usePerfumes } from "../src/hooks/usePerfumes";
-import { useFilters } from "../src/hooks/useFilters";
-import { WeatherCard } from "../src/components/weatherCard";
-import { PerfumeCard } from "../src/components/perfumeCard";
-import { FilterBar } from "../src/components/filterBar";
-import { LoadingScreen } from "../src/components/loadingScreen";
-import { ErrorMessage } from "../src/components/errorBoundary";
-import { Perfume } from "../src/types";
-import { useFavorites } from "../src/context/FavoritesContext";
+import { useWeather } from "../../src/hooks/useWeather";
+import { usePerfumes } from "../../src/hooks/usePerfumes";
+import { useFilters } from "../../src/hooks/useFilters";
+import { WeatherCard } from "../../src/components/weatherCard";
+import { PerfumeCard } from "../../src/components/perfumeCard";
+import { FilterBar } from "../../src/components/filterBar";
+import { LoadingScreen } from "../../src/components/loadingScreen";
+import { ErrorMessage } from "../../src/components/errorBoundary";
+import { Perfume } from "../../src/types";
+import { useFavorites } from "../../src/context/FavoritesContext";
 import { useEffect, useRef } from "react";
-import { theme } from "../src/theme";
-import { useAuth } from "../src/context/AuthContext";
-import { useCollection } from "../src/context/CollectionContext";
+import { theme } from "../../src/theme";
+import { useAuth } from "../../src/context/AuthContext";
+import { useCollection } from "../../src/context/CollectionContext";
 
 
 export default function HomeScreen() {

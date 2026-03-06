@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Image, Modal, ScrollView, ActivityIndicator } from "react-native";
 import { useState, useMemo } from "react";
 import { useRouter } from "expo-router";
-import { usePerfumes } from "../src/hooks/usePerfumes";
-import { useFavorites } from "../src/context/FavoritesContext";
-import { Perfume } from "../src/types";
-import { theme } from "../src/theme";
+import { usePerfumes } from "../../src/hooks/usePerfumes";
+import { useFavorites } from "../../src/context/FavoritesContext";
+import { Perfume } from "../../src/types";
+import { theme } from "../../src/theme";
 
 type SortOption = "name" | "brand" | "intensity";
 type GenderFilter = "tous" | "masculin" | "féminin" | "mixte";
