@@ -15,10 +15,16 @@ export default function SettingsScreen() {
     return (
         <View style={styles.wrapper}>
             <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.headline}>Paramètres ⚙️</Text>
+              {/* Header */}
+              <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                   <Text style={styles.backText}>←</Text>
                 </TouchableOpacity>
+                <Text style={styles.headline}>Paramètres ⚙️</Text>
+                <View style={{ width: 36 }} />
+              </View>
+
+              {/* Réglages notifications */}
                 <NotificationSettings
                     enabled={settings.enabled}
                     hour={settings.hour}
@@ -29,6 +35,8 @@ export default function SettingsScreen() {
                     onDisable={disableNotifications}
                     onUpdateTime={updateTime}
                 />
+
+                  {/* Carte d'explication */}
                 <View style={styles.infoCard}>
                     <Text style={styles.infoTitle}>Comment ça fonctionne ?</Text>
                     <Text style={styles.infoText}>
@@ -41,6 +49,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -53,12 +62,15 @@ const styles = StyleSheet.create({
     paddingTop: 60, 
     paddingBottom: 40 
 },
+
+  // Header
   headline: { 
-    fontSize: 28, 
+    fontSize: 22, 
     fontWeight: "bold", 
     color: theme.colors.textPrimary, 
-    marginBottom: 24 
 },
+
+  // Carte info
   infoCard: {
     backgroundColor: theme.colors.card,
     borderRadius: 16,
@@ -75,6 +87,8 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary, 
     lineHeight: 20 
 },
+
+  // Navigation
 backButton: {
     width: 36,
     height: 36,
@@ -83,10 +97,16 @@ backButton: {
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.2)",
+    borderColor: theme.colors.gold20,
   },
   backText: {
     fontSize: 18,
     color: theme.colors.gold,
+  },
+   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 28,
   },
 });

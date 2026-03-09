@@ -66,6 +66,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
+        {/* Header animé */}
         <Animated.View
           style={[
             styles.header,
@@ -85,6 +86,7 @@ export default function HomeScreen() {
 
         {weather && <WeatherCard weather={weather} />}
 
+        {/* Barre de filtres */}
         <FilterBar
           filters={filters}
           perfumes={perfumes}
@@ -96,6 +98,7 @@ export default function HomeScreen() {
         />
 
         {hasCollection && (
+          // Collection utilisateur
           <View style={styles.collectionSection}>
             <Text style={styles.collectionTitle}>Ma Collection 💎</Text>
             <ScrollView
@@ -138,6 +141,7 @@ export default function HomeScreen() {
         {perfumesLoading ? (
           <LoadingScreen message="Analyse des parfums..." />
         ) : (
+          // Liste recommandée
           filteredRecommendations.map((perfume, index) => (
             <PerfumeCard
               key={perfume.id}
@@ -166,6 +170,7 @@ export default function HomeScreen() {
 
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -178,6 +183,8 @@ const styles = StyleSheet.create({
     paddingTop: 60, 
     paddingBottom: 40 
   },
+
+  // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -200,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -208,6 +215,8 @@ const styles = StyleSheet.create({
     fontSize: 20, 
     color: theme.colors.gold 
   },
+
+  // Recommandations & footer
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -219,12 +228,14 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.lg,
     paddingTop: theme.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: "#c9a84c1a",
+    borderTopColor: theme.colors.gold10,
   },
   footerText: { 
     fontSize: 12, 
     color: theme.colors.textMuted 
   },
+
+  // Collection
   collectionSection: {
     marginBottom: 24,
   },
@@ -246,12 +257,12 @@ const styles = StyleSheet.create({
   collectionItemImage: {
     width: 90,
     height: 90,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.white,
     borderRadius: theme.radius.md,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
     overflow: "hidden",
   },
   collectionItemName: {

@@ -46,6 +46,7 @@ export default function AuthScreen() {
         return (
             <View style={styles.wrapper}>
                 <View style={styles.container}>
+            {/* Header confirmation */}
                     <View style={styles.header}>
                         <Text style={styles.emoji}>📬</Text>
                         <Text style={styles.title}>Vérifie tes emails</Text>
@@ -57,6 +58,7 @@ export default function AuthScreen() {
                         </Text>
                     </View>
 
+                      {/* Action principale */}
                     <TouchableOpacity style={styles.button} onPress={() => {
                             setEmailSent(false);
                             setIsLogin(true);
@@ -67,6 +69,7 @@ export default function AuthScreen() {
                         <Text style={styles.buttonText}>Se connecter</Text>
                     </TouchableOpacity>
 
+                    {/* Action secondaire */}
                     <TouchableOpacity style={styles.resendButton} onPress={() => signUp(email, password)}>
                         <Text style={styles.resendText}>Renvoyer l'email</Text>
                     </TouchableOpacity>
@@ -78,6 +81,7 @@ export default function AuthScreen() {
     return (
         <KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <View style={styles.container}>
+          {/* Header auth */}
                 <View style={styles.header}>
                     <Text style={styles.emoji}>🌸</Text>
                     <Text style={styles.title}>Skyscent</Text>
@@ -86,6 +90,7 @@ export default function AuthScreen() {
                     </Text>
                 </View>
 
+                    {/* Formulaire */}
                 <View style={styles.form}>
                     {error && (
                         <View style={styles.errorBox}>
@@ -97,7 +102,7 @@ export default function AuthScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="ton@gmail.com"
-                        placeholderTextColor="#aaaaaa"
+                        placeholderTextColor={theme.colors.placeholder}
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -108,7 +113,7 @@ export default function AuthScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="********"
-                        placeholderTextColor="#aaaaaa"
+                        placeholderTextColor={theme.colors.placeholder}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -123,7 +128,7 @@ export default function AuthScreen() {
                                     confirmPassword && password !== confirmPassword ? styles.inputError : null,
                                 ]}
                                 placeholder="********"
-                                placeholderTextColor="#aaaaaa"
+                                placeholderTextColor={theme.colors.placeholder}
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
                                 secureTextEntry
@@ -140,6 +145,7 @@ export default function AuthScreen() {
                         </TouchableOpacity>
                     </View>
 
+                      {/* Changement de mode */}
                     <View style={styles.footer}>
                         <Text style={styles.footerText}>
                             {isLogin ? "Pas de compte ?" : "Déjà un compte ?"}
@@ -154,6 +160,7 @@ export default function AuthScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -163,6 +170,8 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: "center",
 },
+
+  // Header
   header: { 
     alignItems: "center", 
     marginBottom: 40 
@@ -183,6 +192,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 20,
 },
+
+  // Form
   form: { 
     marginBottom: 24 
 },
@@ -210,16 +221,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: theme.colors.textPrimary,
     borderWidth: 1,
-    borderColor: "#e8e8e8",
+    borderColor: theme.colors.inputBorder,
   },
   inputError: { 
-    borderColor: "#e53e3e" 
+    borderColor: theme.colors.danger 
 },
   fieldError: { 
-    color: "#e53e3e", 
+    color: theme.colors.danger, 
     fontSize: 12, 
     marginTop: 4 
 },
+
+  // Boutons
   button: {
     backgroundColor: theme.colors.gold,
     padding: 16,
@@ -235,6 +248,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold", 
     fontSize: 16 
 },
+
+  // Footer
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -250,6 +265,8 @@ const styles = StyleSheet.create({
     fontWeight: "600", 
     fontSize: 14 
 },
+
+  // Confirmation email
 emailHighlight: {
   color: theme.colors.gold,
   fontWeight: "600",

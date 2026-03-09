@@ -10,18 +10,18 @@ interface   Props {
 const getWeatherBackground = (condition: string) => {
     switch (condition.toLowerCase()) {
         case "snow": 
-            return "#1A2A4A"; // Bleu sombre pour la neige
+      return theme.colors.weatherSnow;
         case "rain":
         case "drizzle": 
-            return "#1A2030"; // Gris sombre pour la pluie
+      return theme.colors.weatherRain;
         case "thunderstorm": 
-            return "#0A0A15"; // Noir profond pour l'orage
+      return theme.colors.weatherStorm;
         case "clouds": 
-            return "#1A1A25"; // Gris foncé pour les nuages
+      return theme.colors.weatherClouds;
         case "clear": 
-            return "#2A1A0A"; // Orange sombre pour le ciel dégagé
+      return theme.colors.weatherClear;
         default: 
-            return "#1A1225"; // Couleur par défaut pour les conditions inconnues
+      return theme.colors.weatherDefault;
     }
 };
 
@@ -92,6 +92,7 @@ export const WeatherCard = ({ weather }: Props) => {
         { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
+      {/* En-tête météo */}
       <View style={styles.topRow}>
         <View>
           <Text style={styles.city}>{weather.city}</Text>
@@ -108,6 +109,7 @@ export const WeatherCard = ({ weather }: Props) => {
 
       <View style={styles.divider} />
 
+      {/* Détails météo */}
       <View style={styles.bottomRow}>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>Ressenti</Text>
@@ -129,12 +131,13 @@ export const WeatherCard = ({ weather }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  // Carte
   card: {
     borderRadius: theme.radius.xl,
     padding: theme.spacing.lg,
     marginBottom: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
   },
   topRow: {
     flexDirection: "row",
@@ -153,6 +156,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   weatherEmoji: { fontSize: 48 },
+
+  // Température
   temp: {
     fontSize: 80,
     fontWeight: "bold",
@@ -162,9 +167,11 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#c9a84c4d",
+    backgroundColor: theme.colors.gold30,
     marginVertical: theme.spacing.md,
   },
+
+  // Détails
   bottomRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -186,6 +193,6 @@ const styles = StyleSheet.create({
   detailDivider: {
     width: 1,
     height: 30,
-    backgroundColor: "#c9a84c33",
+    backgroundColor: theme.colors.gold20,
   },
 });

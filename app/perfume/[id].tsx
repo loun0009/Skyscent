@@ -14,16 +14,16 @@ import { StarRating } from "../../src/components/starRating";
 import { useCollection } from "../../src/context/CollectionContext";
 
 const SEASON_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
-  spring: { emoji: "🌱", label: "Printemps", color: "rgba(76, 175, 80, 0.2)" },
-  summer: { emoji: "☀️", label: "Été", color: "rgba(255, 193, 7, 0.2)" },
-  autumn: { emoji: "🍂", label: "Automne", color: "rgba(255, 152, 0, 0.2)" },
-  winter: { emoji: "❄️", label: "Hiver", color: "rgba(33, 150, 243, 0.2)" },
+  spring: { emoji: "🌱", label: "Printemps", color: theme.colors.seasonSpring },
+  summer: { emoji: "☀️", label: "Été", color: theme.colors.seasonSummer },
+  autumn: { emoji: "🍂", label: "Automne", color: theme.colors.seasonAutumn },
+  winter: { emoji: "❄️", label: "Hiver", color: theme.colors.seasonWinter },
 };
 
 const INTENSITY_CONFIG: Record<string, { emoji: string; color: string; dot: string }> = {
-  "légère":  { emoji: "🌸", color: "rgba(76, 175, 80, 0.15)",  dot: "#4CAF50" },
-  "modérée": { emoji: "🌺", color: "rgba(255, 152, 0, 0.15)",  dot: "#FF9800" },
-  "intense": { emoji: "🔥", color: "rgba(244, 67, 54, 0.15)",  dot: "#F44336" },
+  "légère":  { emoji: "🌸", color: theme.colors.intensityLightBg, dot: theme.colors.intensityLightDot },
+  "modérée": { emoji: "🌺", color: theme.colors.intensityMediumBg, dot: theme.colors.intensityMediumDot },
+  "intense": { emoji: "🔥", color: theme.colors.intensityStrongBg, dot: theme.colors.intensityStrongDot },
 };
 
 export default function PerfumeDetailScreen() {
@@ -122,7 +122,7 @@ export default function PerfumeDetailScreen() {
           resizeMode="contain"
         />
         <LinearGradient
-          colors={["transparent", "rgba(10,10,15,0.7)", theme.colors.background]}
+          colors={["transparent", theme.colors.overlayDark, theme.colors.background]}
           style={styles.gradient}
         />
 
@@ -370,7 +370,7 @@ export default function PerfumeDetailScreen() {
         </View>
 
 
-        {/* Bouton porté discret */}
+        {/* Action portée du jour */}
         <TouchableOpacity
           style={[
             styles.wornButton,
@@ -398,6 +398,7 @@ export default function PerfumeDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   center: { 
     flex: 1, 
     justifyContent: "center", 
@@ -435,7 +436,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center",
     borderWidth: 1, 
-    borderColor: "#c9a84c4d",
+    borderColor: theme.colors.gold30,
   },
   backText: { 
     fontSize: 18, 
@@ -554,7 +555,7 @@ const styles = StyleSheet.create({
   intensityDivider: { 
     width: 1, 
     height: 30, 
-    backgroundColor: "#c9a84c33",
+    backgroundColor: theme.colors.gold20,
       marginHorizontal: 8, 
   },
 
@@ -599,9 +600,9 @@ const styles = StyleSheet.create({
     gap: 8 
   },
   tag: { 
-    backgroundColor: "#c9a84c14",
+    backgroundColor: theme.colors.gold08,
     borderWidth: 1, 
-    borderColor: "#c9a84c40",
+    borderColor: theme.colors.gold25,
     paddingHorizontal: 12, 
     paddingVertical: 6, 
     borderRadius: 20 
@@ -620,7 +621,7 @@ const styles = StyleSheet.create({
     borderRadius: 20, 
     marginBottom: 32,
     borderWidth: 1, 
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
   },
   wornButtonActive: {
     borderColor: theme.colors.success,
@@ -636,7 +637,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted 
   },
 
-  // Erreur
+  // Erreur & infos génériques
   errorText: {
     fontSize: 16,
     color: theme.colors.error,
@@ -647,7 +648,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", 
     paddingVertical: 10, 
     borderBottomWidth: 1, 
-    borderBottomColor: "#c9a84c1a"
+    borderBottomColor: theme.colors.gold10
   },
   infoLabel: {
     color: theme.colors.textSecondary, 
@@ -659,7 +660,7 @@ const styles = StyleSheet.create({
     fontWeight: "600" 
   },
 
-   // Rating
+  // Rating
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -669,7 +670,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
   },
   ratingAverage: {
     fontSize: 36,
@@ -684,11 +685,11 @@ const styles = StyleSheet.create({
 
   // Mon avis
   myReviewCard: {
-    backgroundColor: "#c9a84c14",
+    backgroundColor: theme.colors.gold08,
     borderRadius: theme.radius.md,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#c9a84c4d",
+    borderColor: theme.colors.gold30,
     marginBottom: 12,
     gap: 8,
   },
@@ -723,7 +724,7 @@ const styles = StyleSheet.create({
   // Bouton ajouter avis
   addReviewButton: {
     borderWidth: 1,
-    borderColor: "#c9a84c4d",
+    borderColor: theme.colors.gold30,
     borderStyle: "dashed",
     borderRadius: theme.radius.md,
     padding: 14,
@@ -742,7 +743,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
     marginBottom: 16,
     gap: 12,
   },
@@ -758,7 +759,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.textPrimary,
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
     minHeight: 80,
   },
   reviewFormActions: {
@@ -799,7 +800,7 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#c9a84c1a",
+    borderColor: theme.colors.gold10,
     gap: 8,
   },
   reviewCardHeader: {
@@ -851,10 +852,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#c9a84c4d",
+    borderColor: theme.colors.gold30,
   },
   collectionButtonActive: {
-    backgroundColor: "#c9a84c1a",
+    backgroundColor: theme.colors.gold10,
     borderColor: theme.colors.gold,
   },
   collectionButtonText: {

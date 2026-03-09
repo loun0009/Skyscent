@@ -9,7 +9,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
-          borderTopColor: "#c9a84c26",
+          borderTopColor: theme.colors.gold15,
           height: 60,
           paddingBottom: 8,
         },

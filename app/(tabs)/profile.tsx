@@ -118,6 +118,7 @@ export default function ProfileScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Progression onboarding */}
           <View style={styles.progressContainer}>
             {Array.from({ length: STEPS }).map((_, i) => (
               <View
@@ -134,6 +135,7 @@ export default function ProfileScreen() {
           <Animated.View
             style={[{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
           >
+            {/* Étape 1: identité */}
             {step === 1 && (
               <View>
                 <Text style={styles.emoji}>👋</Text>
@@ -161,6 +163,7 @@ export default function ProfileScreen() {
               </View>
             )}
 
+            {/* Étape 2: intensité */}
             {step === 2 && (
               <View>
                 <Text style={styles.emoji}>🌸</Text>
@@ -189,6 +192,7 @@ export default function ProfileScreen() {
               </View>
             )}
 
+            {/* Étape 3: saison */}
             {step === 3 && (
               <View>
                 <Text style={styles.emoji}>🗓️</Text>
@@ -212,6 +216,7 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
+            {/* Étape 4: collection */}
             {step === 4 && (
             <View>
               <Text style={styles.emoji}>💎</Text>
@@ -284,6 +289,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.wrapper}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <Text style={styles.headline}>Mon profil 👤</Text>
 
           {/* Avatar */}
@@ -443,6 +449,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -455,6 +462,8 @@ const styles = StyleSheet.create({
     paddingTop: 60, 
     paddingBottom: 40 
 },
+
+  // Header & identité
   headline: { 
     fontSize: 28, 
     fontWeight: "bold", 
@@ -494,12 +503,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted, 
     marginTop: 4 
 },
+
+  // Carte infos personnelles
   card: {
     backgroundColor: theme.colors.card, 
     borderRadius: 16, 
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000000", 
+    shadowColor: theme.colors.black, 
     shadowOffset: { 
         width: 0, 
         height: 2 
@@ -529,7 +540,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10, 
     borderBottomWidth: 1, 
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: theme.colors.borderSubtle,
   },
   infoLabel: { 
     color: theme.colors.textSecondary, 
@@ -618,6 +629,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold", 
     fontSize: 15 
 },
+
+  // Onboarding
   onboardingContainer: { 
     padding: 24, 
     paddingTop: 80, 
@@ -670,12 +683,12 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     marginBottom: 12, 
     borderWidth: 1, 
-    borderColor: "#c9a84c26", 
+    borderColor: theme.colors.gold15, 
     gap: 14 
   },
   optionCardActive: { 
     borderColor: theme.colors.gold, 
-    backgroundColor: "#c9a84c14" 
+    backgroundColor: theme.colors.gold08 
   },
   optionEmoji: { 
     fontSize: 28 
@@ -714,12 +727,12 @@ const styles = StyleSheet.create({
     padding: 24, 
     alignItems: "center", 
     borderWidth: 1, 
-    borderColor: "#c9a84c26", 
+    borderColor: theme.colors.gold15, 
     gap: 8 
   },
   seasonCardActive: { 
     borderColor: theme.colors.gold, 
-    backgroundColor: "#c9a84c14" 
+    backgroundColor: theme.colors.gold08 
   },
   seasonEmoji: { 
     fontSize: 36 
@@ -747,6 +760,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold", 
     fontSize: 16 
   },
+
+  // Raccourcis
   shortcutsRow: {
     flexDirection: "row",
     gap: 12,
@@ -760,7 +775,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
   },
   shortcutEmoji: {
     fontSize: 24,
@@ -770,6 +785,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
+
+  // Collection onboarding
   collectionCount: {
     fontSize: 13,
     color: theme.colors.gold,
@@ -791,16 +808,16 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
   },
   collectionCardActive: {
     borderColor: theme.colors.gold,
-    backgroundColor: "#c9a84c14",
+    backgroundColor: theme.colors.gold08,
   },
   collectionImageContainer: {
     width: "100%",
     height: 100,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.white,
     position: "relative",
   },
   collectionImage: {
@@ -809,13 +826,13 @@ const styles = StyleSheet.create({
   },
   collectionCheckOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#c9a84c4d",
+    backgroundColor: theme.colors.gold30,
     justifyContent: "center",
     alignItems: "center",
   },
   collectionCheck: {
     fontSize: 32,
-    color: "#fff",
+    color: theme.colors.white,
     fontWeight: "bold",
   },
   collectionName: {

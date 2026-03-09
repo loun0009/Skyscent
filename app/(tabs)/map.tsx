@@ -22,10 +22,10 @@ const openInMaps = (store: PerfumeStore) => {
 };
 
 export default function MapScreen() {
-    // Utilise le hook personnalisé pour obtenir les parfumeries à proximité et la localisation de l'utilisateur
+  // Utilise le hook personnalisé pour obtenir les parfumeries à proximité et la localisation de l'utilisateur
   const { stores, loading, error, userLocation, refresh, radius, setRadius } =
     useNearbyStores();
-    // Stocke la parfumerie sélectionnée pour afficher ses détails
+  // Stocke la parfumerie sélectionnée pour afficher ses détails
   const [selectedStore, setSelectedStore] = useState<PerfumeStore | null>(null);
 
   if (loading) {
@@ -76,8 +76,8 @@ export default function MapScreen() {
         <Circle
           center={userLocation}
           radius={radius}
-          strokeColor="#c9a84c66"
-          fillColor="#c9a84c0d"
+          strokeColor={theme.colors.gold40}
+          fillColor={theme.colors.gold05}
         />
 
         {/* Marqueurs parfumeries */}
@@ -91,7 +91,7 @@ export default function MapScreen() {
             title={store.name}
             description={store.address}
             pinColor={
-              selectedStore?.id === store.id ? "#FF6B6B" : "#C9A84C"
+              selectedStore?.id === store.id ? theme.colors.error : theme.colors.gold
             }
             onPress={() => setSelectedStore(store)}
           />
@@ -143,8 +143,8 @@ export default function MapScreen() {
                     styles.openBadge,
                     {
                       backgroundColor: selectedStore.isOpen
-                        ? "#4caf5033"
-                        : "#ff6b6b33",
+                        ? theme.colors.success20
+                        : theme.colors.error20,
                     },
                   ]}
                 >
@@ -217,17 +217,18 @@ export default function MapScreen() {
 
 // Style sombre pour Google Maps
 const darkMapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#0A0A0F" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#9A8F82" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#0A0A0F" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1A1A26" }] },
-  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#12121A" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#22222F" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#050510" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#0A1A0A" }] },
+  { elementType: "geometry", stylers: [{ color: theme.colors.background }] },
+  { elementType: "labels.text.fill", stylers: [{ color: theme.colors.textSecondary }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: theme.colors.background }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: theme.colors.card }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: theme.colors.surface }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: theme.colors.cardElevated }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: theme.colors.mapWater }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: theme.colors.mapPark }] },
 ];
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -242,6 +243,8 @@ const styles = StyleSheet.create({
   map: { 
     flex: 1 
 },
+
+  // États (chargement/erreur)
   loadingText: {
     color: theme.colors.textSecondary,
     marginTop: 12,
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   retryButton: {
-    backgroundColor: "#c9a84c1a",
+    backgroundColor: theme.colors.gold10,
     borderWidth: 1,
     borderColor: theme.colors.gold,
     paddingHorizontal: 24,
@@ -269,6 +272,8 @@ const styles = StyleSheet.create({
     color: theme.colors.gold, 
     fontWeight: "600" 
   },
+
+  // Overlay carte
   header: {
     position: "absolute",
     top: 60,
@@ -277,11 +282,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#0A0A0F",
+    backgroundColor: theme.colors.background,
     padding: 14,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
   },
   headline: {
     fontSize: 18,
@@ -305,9 +310,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#0A0A0F",
+    backgroundColor: theme.colors.background,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
   },
   radiusPillActive: {
     backgroundColor: theme.colors.gold,
@@ -321,6 +326,8 @@ const styles = StyleSheet.create({
   radiusTextActive: { 
     color: theme.colors.background 
 },
+
+  // Carte magasin sélectionné
   storeCard: {
     position: "absolute",
     bottom: 20,
@@ -332,7 +339,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
     gap: 12,
   },
   storeInfo: { 
@@ -379,6 +386,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
+
+  // Liste horizontale des magasins
   storeList: {
     position: "absolute",
     bottom: 20,
@@ -395,7 +404,7 @@ const styles = StyleSheet.create({
     padding: 12,
     width: 180,
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
   },
   storeListName: {
     fontSize: 13,

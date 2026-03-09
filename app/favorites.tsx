@@ -20,10 +20,16 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.headline}>Mes favoris ❤️</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backText}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headline}>Mes favoris ❤️</Text>
+          <View style={{ width: 36 }} />
+        </View>
+
+        {/* Contenu: état vide ou liste */}
 
         {!loading && favoritePerfumes.length === 0 ? (
           <View style={styles.empty}>
@@ -50,6 +56,7 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -60,12 +67,15 @@ const styles = StyleSheet.create({
     paddingTop: 60, 
     paddingBottom: 40 
   },
+
+  // Header
   headline: { 
-    fontSize: 28, 
+    fontSize: 22, 
     fontWeight: "bold", 
     color: theme.colors.textPrimary, 
-    marginBottom: 24 
   },
+
+  // État vide
   empty: { 
     flex: 1, 
     alignItems: "center", 
@@ -87,6 +97,8 @@ const styles = StyleSheet.create({
     textAlign: "center", 
     lineHeight: 22 
   },
+
+  // Navigation
    backButton: {
     width: 36,
     height: 36,
@@ -95,10 +107,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.2)",
+    borderColor: theme.colors.gold20,
   },
   backText: {
     fontSize: 18,
     color: theme.colors.gold,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 28,
   },
 });

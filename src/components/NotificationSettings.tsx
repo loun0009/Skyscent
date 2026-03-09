@@ -47,6 +47,7 @@ export const NotificationSettings = ({
 
     return (
     <View style={styles.card}>
+      {/* Ligne principale */}
       <View style={styles.row}>
         <View>
           <Text style={styles.title}>Parfum du jour 🔔</Text>
@@ -65,6 +66,7 @@ export const NotificationSettings = ({
       </View>
 
       {enabled && (
+        // Action changement d'heure
         <TouchableOpacity
           style={styles.timeButton}
           onPress={() => setModalVisible(true)}
@@ -81,6 +83,7 @@ export const NotificationSettings = ({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
+        {/* Modal sélecteur d'heure */}
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Choisir l'heure</Text>
@@ -143,12 +146,13 @@ export const NotificationSettings = ({
 };
 
 const styles = StyleSheet.create({
+  // Carte principale
   card: {
     backgroundColor: theme.colors.background,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000000",
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -171,7 +175,7 @@ const styles = StyleSheet.create({
 },
   timeButton: {
     marginTop: 12,
-    backgroundColor: "#c9a84c1a",
+    backgroundColor: theme.colors.gold10,
     padding: 10,
     borderRadius: 10,
     alignItems: "center",
@@ -181,6 +185,8 @@ const styles = StyleSheet.create({
     fontWeight: "600", 
     fontSize: 14 
 },
+
+  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pickerItemActive: { 
-    backgroundColor: "#c9a84c1a" 
+    backgroundColor: theme.colors.gold10 
 },
   pickerItemText: { 
     fontSize: 18, 
@@ -241,6 +247,8 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary, 
     marginHorizontal: 16 
 },
+
+  // Actions modal
   saveButton: {
     backgroundColor: theme.colors.gold,
     padding: 16,

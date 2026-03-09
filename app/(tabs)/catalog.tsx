@@ -42,9 +42,9 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ];
 
 const INTENSITY_DOT: Record<string, string> = {
-  "légère": "#4CAF50",
-  "modérée": "#FF9800",
-  "intense": "#F44336",
+  "légère": theme.colors.intensityLightDot,
+  "modérée": theme.colors.intensityMediumDot,
+  "intense": theme.colors.intensityStrongDot,
 };
 
 const PerfumeGridCard = ({
@@ -58,6 +58,7 @@ const PerfumeGridCard = ({
   isFavorite: boolean;
   onToggleFavorite: (id: number) => void;
 }) => (
+  // Carte unitaire de la grille catalogue
   <TouchableOpacity
     style={styles.gridCard}
     onPress={() => onPress(perfume)}
@@ -156,7 +157,7 @@ export default function CatalogScreen() {
 
   return (
     <View style={styles.wrapper}>
-
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headline}>Catalogue 🌸</Text>
         <Text style={styles.counter}>
@@ -164,6 +165,7 @@ export default function CatalogScreen() {
         </Text>
       </View>
 
+      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
@@ -181,6 +183,7 @@ export default function CatalogScreen() {
         )}
       </View>
 
+      {/* Tri + ouverture des filtres */}
       <View style={styles.controlsRow}>
         <ScrollView
           horizontal
@@ -316,6 +319,7 @@ export default function CatalogScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1, 
     backgroundColor: theme.colors.background 
@@ -326,6 +330,8 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     backgroundColor: theme.colors.background 
   },
+
+  // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -437,13 +443,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: theme.colors.gold
-    ,
+    borderColor: theme.colors.gold,
   },
   gridImageContainer: {
     width: "100%",
     height: 150,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.white,
     position: "relative",
   },
   gridImage: { 

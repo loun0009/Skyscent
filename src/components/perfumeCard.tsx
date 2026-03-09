@@ -14,9 +14,9 @@ interface Props {
 }
 
 const intensityConfig = {
-  "légère": { color: theme.colors.intensityLight, dot: "#4CAF50" },
-  "modérée": { color: theme.colors.intensityMedium, dot: "#FF9800" },
-  "intense": { color: theme.colors.intensityStrong, dot: "#F44336" },
+  "légère": { color: theme.colors.intensityLight, dot: theme.colors.intensityLightDot },
+  "modérée": { color: theme.colors.intensityMedium, dot: theme.colors.intensityMediumDot },
+  "intense": { color: theme.colors.intensityStrong, dot: theme.colors.intensityStrongDot },
 };
 
 export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavorite, index = 0, rating }: Props) => {
@@ -46,6 +46,7 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
     return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateX: slideAnim }],}}>
       <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)} activeOpacity={0.8}>
+        {/* Image */}
         <View style={styles.imageContainer}>
           <Image source={imageError || !perfume.image_url ? require("../../assets/adaptative_logo.png") : { uri: perfume.image_url }}
             style={styles.image}
@@ -53,6 +54,7 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
             onError={() => setImageError(true)}
           />
         </View>
+        {/* Contenu */}
         <View style={styles.content}>
           <View style={styles.header}>
             <View style={styles.titleBlock}>
@@ -98,6 +100,7 @@ export const PerfumeCard= ({ perfume, onPress, isFavorite = false, onToggleFavor
 };
 
 const styles = StyleSheet.create({
+  // Carte
   card: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.lg,
@@ -105,13 +108,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
     minHeight: 120,
   },
   imageContainer: {
     width: 120,
     height: 120,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.white,
     justifyContent: "center",
     alignItems: "center",
 },
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
     height: 110,
     resizeMode: "contain", 
   },
+  // Contenu principal
   content: { 
     flex: 1, 
     padding: 12, 
@@ -179,15 +183,16 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginVertical: 6,
   },
+  // Notes
   notesRow: { 
     flexDirection: "row", 
     flexWrap: "wrap", 
     gap: 4 
   },
   noteTag: {
-    backgroundColor: "#c9a84c1a",
+    backgroundColor: theme.colors.gold10,
     borderWidth: 1,
-    borderColor: "#c9a84c33",
+    borderColor: theme.colors.gold20,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 20,

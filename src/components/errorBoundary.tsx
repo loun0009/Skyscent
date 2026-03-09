@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { theme } from "../theme";
 
 interface Props {
     message: string;
@@ -8,6 +9,7 @@ interface Props {
 export const ErrorMessage = ({ message, onRetry }: Props) => {
     return (
         <View style={styles.container}>
+      {/* Contenu erreur */}
             <Text style={styles.emoji}>⚠️</Text>
             <Text style={styles.message}>{message}</Text>
             <TouchableOpacity style={styles.button} onPress={onRetry}>
@@ -18,29 +20,32 @@ export const ErrorMessage = ({ message, onRetry }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  // Layout
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
-    backgroundColor: "#f8f8fc",
+    backgroundColor: theme.colors.background,
   },
   emoji: { fontSize: 48, marginBottom: 16 },
   message: {
     fontSize: 16,
-    color: "#555",
+    color: theme.colors.textDim,
     textAlign: "center",
     lineHeight: 24,
     marginBottom: 24,
   },
+
+  // Action
   button: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: theme.colors.primaryAction,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
   },
   buttonText: { 
-    color: "#fff", 
+    color: theme.colors.white, 
     fontWeight: "600", 
     fontSize: 15 
 },

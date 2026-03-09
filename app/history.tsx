@@ -74,6 +74,7 @@ export default function HistoryScreen() {
     return (
     <View style={styles.wrapper}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backText}>←</Text>
@@ -84,8 +85,10 @@ export default function HistoryScreen() {
               <Text style={styles.clearButton}>Tout effacer</Text>
             </TouchableOpacity>
           )}
+          <View style={{ width: 36 }} />
         </View>
 
+        {/* États: chargement, vide, liste */}
         {loading ? (
           <ActivityIndicator color={theme.colors.gold} style={{ marginTop: 40 }} />
         ) : history.length === 0 ? (
@@ -97,7 +100,7 @@ export default function HistoryScreen() {
             </Text>
           </View>
         ) : (
-            // Parcours les groupes de dates et affiche les entrées correspondantes
+          // Parcours les groupes de dates et affiche les entrées correspondantes
           Object.entries(grouped).map(([date, entries]) => (
             <View key={date} style={styles.group}>
               <Text style={styles.groupTitle}>{date}</Text>
@@ -144,6 +147,7 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Layout
   wrapper: { 
     flex: 1,
     backgroundColor: theme.colors.background 
@@ -156,14 +160,16 @@ const styles = StyleSheet.create({
     paddingTop: 60, 
     paddingBottom: 40 
   },
+
+  // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 28,
   },
   headline: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "bold",
     color: theme.colors.textPrimary,
   },
@@ -172,6 +178,8 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontWeight: "600",
   },
+
+  // État vide
   empty: { 
     alignItems: "center", 
     marginTop: 80 
@@ -192,6 +200,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
   },
+
+  // Groupes et cartes d'historique
   group: { 
     marginBottom: 24 
   },
@@ -211,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#c9a84c26",
+    borderColor: theme.colors.gold15,
     gap: 12,
   },
   cardLeft: {
@@ -256,7 +266,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#ff6b6b1a",
+    backgroundColor: theme.colors.error10,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -265,6 +275,8 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontWeight: "bold",
   },
+
+  // Navigation
   backButton: {
     width: 36,
     height: 36,
@@ -273,7 +285,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.2)",
+    borderColor: theme.colors.gold20,
   },
   backText: {
     fontSize: 18,

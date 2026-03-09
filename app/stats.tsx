@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.2)",
+    borderColor: theme.colors.gold20,
   },
   backText: { 
     fontSize: 18, 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     padding: 14,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.15)",
+    borderColor: theme.colors.gold15,
     gap: 4,
   },
   keyStatValue: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "rgba(201, 168, 76, 0.15)",
+    borderColor: theme.colors.gold15,
     gap: 14,
   },
   statEmoji: { 

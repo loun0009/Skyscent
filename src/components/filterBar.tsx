@@ -28,6 +28,7 @@ export const FilterBar = ({ filters, perfumes, activeCount, onGenderChange, onIn
 
     return (
         <View style={styles.container}>
+        {/* Bouton principal + reset */}
             <TouchableOpacity style={[styles.filterButton, activeCount > 0 && styles.filterButtonActive]} onPress={() => setModalVisible(true)}>
                 <Text style={[styles.filterButtonText, activeCount > 0 && styles.filterButtonTextActive]}>
                     Filtre {activeCount > 0 ? `(${activeCount})` : ''}
@@ -39,6 +40,7 @@ export const FilterBar = ({ filters, perfumes, activeCount, onGenderChange, onIn
             )}
 
             <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={() => setModalVisible(false)}>
+              {/* Modal filtres */}
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
@@ -93,6 +95,7 @@ export const FilterBar = ({ filters, perfumes, activeCount, onGenderChange, onIn
 }
 
 const styles = StyleSheet.create({
+  // Barre principale
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterButton: {
-    backgroundColor: "#c9a84c1a",
+    backgroundColor: theme.colors.gold10,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
@@ -116,6 +119,8 @@ const styles = StyleSheet.create({
   filterButtonTextActive: {
     color: theme.colors.card,
   },
+
+  // (legacy) reset personnalisé
   resetButton: {
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -127,6 +132,8 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: 13,
   },
+
+  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -154,6 +161,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: theme.colors.textSecondary,
   },
+
+  // Filtres
   filterLabel: {
     fontSize: 14,
     fontWeight: "600",
@@ -181,6 +190,8 @@ const styles = StyleSheet.create({
     color: theme.colors.card,
     fontWeight: "600",
   },
+
+  // Action
   applyButton: {
     backgroundColor: theme.colors.gold,
     padding: 16,
