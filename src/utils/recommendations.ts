@@ -15,9 +15,11 @@ const getTodayKey = (): string => {
   return new Date().toISOString().split("T")[0];
 };
 
-const loadHistory = async (): Promise<Record<string, number[]>> => {
+const getHistoryKey = (gender?: string | null): string => `recommendations_history${gender ?? "all"}`;
+
+const loadHistory = async (gender?: string | null): Promise<Record<string, number[]>> => {
   try {
-    const raw = await AsyncStorage.getItem(HISTORY_KEY);
+    const raw = await AsyncStorage.getItem(getHistoryKey(gender));
     return raw ? JSON.parse(raw) : {};
   } catch (e) {
     console.error("Failed to load history", e);
@@ -25,9 +27,9 @@ const loadHistory = async (): Promise<Record<string, number[]>> => {
   }
 };
 
-const saveHistory = async (ids: number[]): Promise<void> => {
+const saveHistory = async (ids: number[], gender?: string | null): Promise<void> => {
   try {
-    const history = await loadHistory();
+    const history = await loadHistory(gender);
     const today = getTodayKey();
     // Ajouter les recommandations du jour
     history[today] = ids;
@@ -36,15 +38,15 @@ const saveHistory = async (ids: number[]): Promise<void> => {
     while (keys.length > MAX_HISTORY_DAYS) {
       delete history[keys.shift()!];
     }
-    await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    await AsyncStorage.setItem(getHistoryKey(gender), JSON.stringify(history));
   } catch (e) {
     console.error("Failed to save history", e);
   }
 };
 
 // Récupérer les IDs des parfums recommandés récemment (hors aujourd'hui)
-const getRecentlyShownIds = async (): Promise<Set<number>> => {
-  const history = await loadHistory();
+const getRecentlyShownIds = async (gender?: string | null): Promise<Set<number>> => {
+  const history = await loadHistory(gender);
   const today = getTodayKey();
   const ids = new Set<number>();
   Object.entries(history).forEach(([date, perfumeIds]) => {
@@ -55,8 +57,8 @@ const getRecentlyShownIds = async (): Promise<Set<number>> => {
   return ids;
 };
 
-const getTodayShownIds = async (): Promise<number[] | null> => {
-  const history = await loadHistory();
+const getTodayShownIds = async (gender?: string | null): Promise<number[] | null> => {
+  const history = await loadHistory(gender);
   return history[getTodayKey()] || null;
 };
 
@@ -106,19 +108,24 @@ export const getRecommendations = (
 
 export const getDailyRecommendations = async (
   weather: WeatherData,
-  perfumes: Perfume[]
+  perfumes: Perfume[],
+  userGender: "masculin" | "féminin" | null
 ): Promise<Perfume[]> => {
-  const todayIds = await getTodayShownIds();
+  const genderFiltered = userGender
+  ? perfumes.filter((p) => p.gender === userGender || p.gender === "mixte")
+  : perfumes;
+
+  const todayIds = await getTodayShownIds(userGender);
   if (todayIds && todayIds.length > 0) {
     const todayPerfumes = todayIds
-      .map((id) => perfumes.find((p) => p.id === id))
+      .map((id) => genderFiltered.find((p) => p.id === id))
       .filter(Boolean) as Perfume[];
     if (todayPerfumes.length > 0) {
       return todayPerfumes;
     }
   }
-  const recentIds = await getRecentlyShownIds();
-  const scored = scorePerfumes(weather, perfumes).filter(({score}) => score > 0);
+  const recentIds = await getRecentlyShownIds(userGender);
+  const scored = scorePerfumes(weather, genderFiltered).filter(({score}) => score > 0);
   const freshPerfumes = scored.filter(({ perfume }) => !recentIds.has(perfume.id));
   const seenPerfumes = scored.filter(({ perfume }) => recentIds.has(perfume.id));
 
@@ -127,6 +134,6 @@ export const getDailyRecommendations = async (
     ...seenPerfumes.sort((a, b) => b.score - a.score),
   ];
   const recommendations = combined.slice(0, 5).map(({ perfume }) => perfume);
-  await saveHistory(recommendations.map((p) => p.id));
+  await saveHistory(recommendations.map((p) => p.id), userGender);
   return recommendations;
 };

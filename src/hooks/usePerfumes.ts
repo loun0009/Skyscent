@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Perfume, WeatherData } from "../types";
 import { fetchPerfumes } from "../services/perfumesApi";
 import { getDailyRecommendations } from "../utils/recommendations";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-
+import { useAuth } from "../context/AuthContext";
 interface UsePerfumesReturn {
     perfumes: Perfume[];
     recommendations: Perfume[];
@@ -16,6 +15,7 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
   const [recommendations, setRecommendations] = useState<Perfume[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     loadPerfumes();
@@ -23,8 +23,9 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
 
   useEffect(() => {
     if (!weather || perfumes.length === 0) return;
-    getDailyRecommendations(weather, perfumes).then(setRecommendations);
-  }, [weather, perfumes]);
+    const mappedGender = user?.gender === "homme" ? "masculin" : user?.gender === "femme" ? "féminin" : null;
+    getDailyRecommendations(weather, perfumes, mappedGender).then(setRecommendations);
+  }, [weather, perfumes, user?.gender]);
 
   const loadPerfumes = async () => {
     try {
