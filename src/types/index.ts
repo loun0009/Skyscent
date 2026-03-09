@@ -22,7 +22,7 @@ export interface Perfume {
     intensity: 'légère' | 'modérée' | 'intense';
     gender: "masculin" | "féminin" | "mixte";
     description: string;
-    image_url: string;
+    image_url: string | null;
 }
 
 // Saisons de l'année

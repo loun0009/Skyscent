@@ -15,7 +15,7 @@ const getTodayKey = (): string => {
   return new Date().toISOString().split("T")[0];
 };
 
-const getHistoryKey = (gender?: string | null): string => `recommendations_history${gender ?? "all"}`;
+const getHistoryKey = (gender?: string | null): string => `${HISTORY_KEY}_${gender ?? "all"}`;
 
 const loadHistory = async (gender?: string | null): Promise<Record<string, number[]>> => {
   try {

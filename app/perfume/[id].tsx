@@ -8,7 +8,6 @@ import { theme } from "../../src/theme";
 import { useHistory } from "../../src/context/HistoryContext";
 import { useWeather } from "../../src/hooks/useWeather";
 import { useFavorites } from "../../src/context/FavoritesContext";
-import { getRecommendations } from "../../src/utils/recommendations";
 import { useReviews } from "../../src/context/ReviewsContext";
 import { StarRating } from "../../src/components/starRating";
 import { useCollection } from "../../src/context/CollectionContext";
@@ -117,7 +116,7 @@ export default function PerfumeDetailScreen() {
       {/* Image plein écran avec dégradé */}
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: perfume.image_url }}
+          source={{ uri: perfume.image_url || "" }}
           style={styles.image}
           resizeMode="contain"
         />

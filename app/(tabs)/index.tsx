@@ -115,10 +115,10 @@ export default function HomeScreen() {
                 >
                   <View style={styles.collectionItemImage}>
                     <Image
-                      source={{ uri: perfume.image_url }}
-                      style={{ width: 70, height: 70 }}
-                      resizeMode="contain"
-                    />
+                        source={{ uri: perfume.image_url || ""}}
+                        style={{ width: 70, height: 70 }}
+                        resizeMode="contain"
+                      />
                   </View>
                   <Text style={styles.collectionItemName} numberOfLines={1}>
                     {perfume.name}
