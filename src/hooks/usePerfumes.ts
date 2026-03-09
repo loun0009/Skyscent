@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Perfume, WeatherData } from "../types";
 import { fetchPerfumes } from "../services/perfumesApi";
-import { getRecommendations } from "../utils/recommendations";
+import { getDailyRecommendations } from "../utils/recommendations";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 interface UsePerfumesReturn {
     perfumes: Perfume[];
@@ -22,8 +23,7 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
 
   useEffect(() => {
     if (!weather || perfumes.length === 0) return;
-    const results = getRecommendations(weather, perfumes);
-    setRecommendations(results);
+    getDailyRecommendations(weather, perfumes).then(setRecommendations);
   }, [weather, perfumes]);
 
   const loadPerfumes = async () => {
