@@ -8,7 +8,7 @@ import { usePerfumes } from "../../src/hooks/usePerfumes";
 import { Image, FlatList } from "react-native";
 
 const GENDER_OPTIONS  = ["homme", "femme", "autre"] as const;
-const STEPS = 4;
+const STEPS = 5;
 
 const INTENSITY_OPTIONS = [
   { value: "légère", label: "Légère", emoji: "🌸", desc: "Discrète et fraîche" },
@@ -67,9 +67,10 @@ export default function ProfileScreen() {
 
   const canProceed = () => {
     if (step === 1) return firstName.trim().length > 0 && lastName.trim().length > 0;
-    if (step === 2) return intensity !== null;
-    if (step === 3) return season !== null;
-    if (step === 4) return true; // Pas de condition, c'est juste pour ajouter des parfums à la collection (optionnel)
+    if (step === 2) return gender !== null;
+    if (step === 3) return intensity !== null;
+    if (step === 4) return season !== null;
+    if (step === 5) return true; // Pas de condition, c'est juste pour ajouter des parfums à la collection (optionnel)
     return false;
   };
 
@@ -78,6 +79,7 @@ export default function ProfileScreen() {
   await updateUserProfile({
     first_name: firstName.trim(),
     last_name: lastName.trim(),
+    gender: gender ?? undefined,
     preferred_intensity: intensity ?? undefined,
     preferred_season: season ?? undefined,
     onboarding_completed: true,
@@ -162,9 +164,54 @@ export default function ProfileScreen() {
                 />
               </View>
             )}
-
-            {/* Étape 2: intensité */}
+              {/* Étape 2: genre */}
             {step === 2 && (
+              <View>
+                <Text style={styles.emoji}>👤</Text>
+                <Text style={styles.title}>Tu es...</Text>
+                <Text style={styles.subtitle}>
+                  Pour te recommander les parfums qui te correspondent.
+                </Text>
+                <View style={styles.genderOnboardingRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.genderCard,
+                      gender === "femme" && styles.genderCardActive,
+                    ]}
+                    onPress={() => setGender("femme")}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.genderEmoji}>👩</Text>
+                    <Text style={[
+                      styles.genderLabel,
+                      gender === "femme" && styles.genderLabelActive,
+                    ]}>
+                      Femme
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.genderCard,
+                      gender === "homme" && styles.genderCardActive,
+                    ]}
+                    onPress={() => setGender("homme")}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.genderEmoji}>👨</Text>
+                    <Text style={[
+                      styles.genderLabel,
+                      gender === "homme" && styles.genderLabelActive,
+                    ]}>
+                      Homme
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Étape 3: intensité */}
+            {step === 3 && (
               <View>
                 <Text style={styles.emoji}>🌸</Text>
                 <Text style={styles.title}>Ton intensité préférée</Text>
@@ -192,8 +239,8 @@ export default function ProfileScreen() {
               </View>
             )}
 
-            {/* Étape 3: saison */}
-            {step === 3 && (
+            {/* Étape 4: saison */}
+            {step === 4 && (
               <View>
                 <Text style={styles.emoji}>🗓️</Text>
                 <Text style={styles.title}>Ta saison préférée</Text>
@@ -216,8 +263,8 @@ export default function ProfileScreen() {
                 </View>
               </View>
             )}
-            {/* Étape 4: collection */}
-            {step === 4 && (
+            {/* Étape 5: collection */}
+            {step === 5 && (
             <View>
               <Text style={styles.emoji}>💎</Text>
               <Text style={styles.title}>Ta collection</Text>
@@ -503,6 +550,38 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted, 
     marginTop: 4 
 },
+
+// genre
+genderOnboardingRow: {
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 8,
+  },
+  genderCard: {
+    flex: 1,
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.radius.lg,
+    padding: 24,
+    alignItems: "center",
+    gap: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.gold15,
+  },
+  genderCardActive: {
+    backgroundColor: theme.colors.gold08,
+    borderColor: theme.colors.gold,
+  },
+  genderEmoji: {
+    fontSize: 48,
+  },
+  genderLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: theme.colors.textSecondary,
+  },
+  genderLabelActive: {
+    color: theme.colors.gold,
+  },
 
   // Carte infos personnelles
   card: {
