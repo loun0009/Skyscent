@@ -1,95 +1,169 @@
-export const theme = {
-  colors: {
-    // Fonds
-    background: "#0A0A0F",
-    surface: "#12121A",
-    card: "#1A1A26",
-    cardElevated: "#22222F",
+// ============================================================
+// DARK THEME (existant)
+// ============================================================
+export const darkTheme = {
+  // Fonds
+  background: '#0a0a0a',
+  surface: '#1a1a1a',
+  surfaceLight: '#242424',
+  card: '#1e1e1e',
+  cardBorder: '#2a2a2a',
 
-    // Accents
-    gold: "#C9A84C",
-    goldLight: "#E8C97A",
-    goldDark: "#9A7A2E",
+  // Textes
+  text: '#ffffff',
+  textSecondary: '#a0a0a0',
+  textTertiary: '#606060',
+  textDim: '#505050',
+  textMuted: '#808080',
 
-    // Textes
-    textPrimary: "#F0E6D3",
-    textSecondary: "#9A8F82",
-    textMuted: "#4A4540",
+  // Or / Accent
+  gold: '#c9a84c',
+  goldLight: '#e8c97a',
+  goldDark: '#8a6e2a',
+  gold05: '#C9A84C0D',
+  gold10: '#C9A84C1A',
+  gold15: '#C9A84C26',
+  gold20: '#C9A84C33',
+  gold30: '#C9A84C4D',
+  gold40: '#C9A84C66',
 
-    // Statuts
-    error: "#FF6B6B",
-    success: "#4CAF50",
-    warning: "#FF9800",
-    danger: "#F44336",
+  // Statuts
+  error: '#e74c3c',
+  error10: '#E74C3C1A',
+  error20: '#E74C3C33',
+  success: '#2ecc71',
+  success20: '#2ECC7133',
+  warning: '#f39c12',
+  info: '#3498db',
 
-    // Intensités
-    intensityLight: "#2A3A2A",
-    intensityMedium: "#3A2A1A",
-    intensityStrong: "#3A1A1A",
+  // Météo
+  weatherSnow: '#b0c4de',
+  weatherRain: '#4682b4',
+  weatherStorm: '#2c3e50',
+  weatherClouds: '#7f8c8d',
+  weatherClear: '#f39c12',
+  weatherDefault: '#95a5a6',
+  overlayDark: '#00000099',
 
-    // Utilitaires
-    white: "#FFFFFF",
-    black: "#000000",
-    placeholder: "#AAAAAA",
-    inputBorder: "#E8E8E8",
-    borderSubtle: "#F0F0F0",
-    textDim: "#555555",
-    primaryAction: "#6B4EFF",
+  // Saisons
+  seasonSpring: '#27ae60',
+  seasonSummer: '#f39c12',
+  seasonAutumn: '#e67e22',
+  seasonWinter: '#3498db',
 
-    // Variantes alpha de l'accent gold
-    gold05: "#C9A84C0D",
-    gold08: "#C9A84C14",
-    gold10: "#C9A84C1A",
-    gold15: "#C9A84C26",
-    gold20: "#C9A84C33",
-    gold25: "#C9A84C40",
-    gold30: "#C9A84C4D",
-    gold40: "#C9A84C66",
+  // Intensité
+  intensityLightBg: '#2ECC7126',
+  intensityMediumBg: '#F39C1226',
+  intensityStrongBg: '#E74C3C26',
+  intensityLightDot: '#2ecc71',
+  intensityMediumDot: '#f39c12',
+  intensityStrongDot: '#e74c3c',
 
-    // Variantes alpha de statuts
-    error10: "#FF6B6B1A",
-    error20: "#FF6B6B33",
-    success20: "#4CAF5033",
+  // Maps
+  mapWater: '#a8d5e2',
+  mapPark: '#b8e0b0',
 
-    // Fonds contextuels météo
-    weatherSnow: "#1A2A4A",
-    weatherRain: "#1A2030",
-    weatherStorm: "#0A0A15",
-    weatherClouds: "#1A1A25",
-    weatherClear: "#2A1A0A",
-    weatherDefault: "#1A1225",
-    overlayDark: "rgba(10,10,15,0.7)",
+  // Utilitaires
+  white: '#ffffff',
+  black: '#000000',
+  placeholder: '#505050',
+  inputBorder: '#333333',
+  borderSubtle: '#2a2a2a',
+  primaryAction: '#c9a84c',
 
-    // Fonds saisonniers
-    seasonSpring: "rgba(76, 175, 80, 0.2)",
-    seasonSummer: "rgba(255, 193, 7, 0.2)",
-    seasonAutumn: "rgba(255, 152, 0, 0.2)",
-    seasonWinter: "rgba(33, 150, 243, 0.2)",
-
-    // Fonds intensité
-    intensityLightBg: "rgba(76, 175, 80, 0.15)",
-    intensityMediumBg: "rgba(255, 152, 0, 0.15)",
-    intensityStrongBg: "rgba(244, 67, 54, 0.15)",
-    intensityLightDot: "#4CAF50",
-    intensityMediumDot: "#FF9800",
-    intensityStrongDot: "#F44336",
-
-    // Couleurs carte/maps
-    mapWater: "#050510",
-    mapPark: "#0A1A0A",
-  },
-
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-  },
-  radius: {
-    sm: 8,
-    md: 12,
-    lg: 20,
-    xl: 28,
-  },
+  // Overlay / Gradients
+  overlay: '#00000080',
+  gradientStart: '#0A0A0A00',
+  gradientEnd: '#0A0A0AFF',
 };
+
+// ============================================================
+// LIGHT THEME
+// ============================================================
+export const lightTheme = {
+  // Fonds
+  background: '#f5f5f0',
+  surface: '#ffffff',
+  surfaceLight: '#f0ede6',
+  card: '#ffffff',
+  cardBorder: '#e0ddd6',
+
+  // Textes
+  text: '#1a1a1a',
+  textSecondary: '#555555',
+  textTertiary: '#888888',
+  textDim: '#aaaaaa',
+  textMuted: '#777777',
+
+  // Or / Accent
+  gold: '#b8903a',
+  goldLight: '#d4a845',
+  goldDark: '#7a5e1a',
+  gold05: '#B8903A0D',
+  gold10: '#B8903A1A',
+  gold15: '#B8903A26',
+  gold20: '#B8903A33',
+  gold30: '#B8903A4D',
+  gold40: '#B8903A66',
+
+  // Statuts
+  error: '#c0392b',
+  error10: '#C0392B1A',
+  error20: '#C0392B33',
+  success: '#27ae60',
+  success20: '#27AE6033',
+  warning: '#d68910',
+  info: '#2980b9',
+
+  // Météo
+  weatherSnow: '#6ea3c8',
+  weatherRain: '#2e6da0',
+  weatherStorm: '#1a252f',
+  weatherClouds: '#5d6d7e',
+  weatherClear: '#d68910',
+  weatherDefault: '#707b7c',
+  overlayDark: '#00000066',
+
+  // Saisons
+  seasonSpring: '#1e8449',
+  seasonSummer: '#d68910',
+  seasonAutumn: '#ca6f1e',
+  seasonWinter: '#2980b9',
+
+  // Intensité
+  intensityLightBg: '#27AE601F',
+  intensityMediumBg: '#D689101F',
+  intensityStrongBg: '#C0392B1F',
+  intensityLightDot: '#27ae60',
+  intensityMediumDot: '#d68910',
+  intensityStrongDot: '#c0392b',
+
+  // Maps
+  mapWater: '#7ec8e3',
+  mapPark: '#90c97a',
+
+  // Utilitaires
+  white: '#ffffff',
+  black: '#000000',
+  placeholder: '#aaaaaa',
+  inputBorder: '#d0cdc6',
+  borderSubtle: '#e8e5de',
+  primaryAction: '#b8903a',
+
+  // Overlay / Gradients
+  overlay: '#0000004D',
+  gradientStart: '#F5F5F000',
+  gradientEnd: '#F5F5F0FF',
+};
+
+// Type partagé
+export type AppTheme = typeof darkTheme;
+
+// Hook utilitaire — à importer dans les composants
+// Usage : const colors = useAppTheme();
+import { useTheme } from '../context/ThemeContext';
+
+export function useAppTheme(): AppTheme {
+  const { isDark } = useTheme();
+  return isDark ? darkTheme : lightTheme;
+}
