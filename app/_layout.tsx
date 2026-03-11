@@ -1,11 +1,11 @@
 import { Stack, Redirect, useSegments } from "expo-router";
-import { Text } from "react-native";
 import { FavoritesProvider } from "../src/context/FavoritesContext";
 import { AuthProvider, useAuth } from "../src/context/AuthContext";
-import { theme } from "../src/theme";
 import { HistoryProvider } from "../src/context/HistoryContext";
 import { ReviewsProvider } from "../src/context/ReviewsContext";
 import { CollectionProvider } from "../src/context/CollectionContext";
+import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
+import { StatusBar } from "expo-status-bar";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -20,34 +20,47 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user && inAuthScreen) {
-    return <Redirect href="/" />;
+    return <Redirect href="/(tabs)" />;
   }
 
   return <>{children}</>;
 };
 
+function AppNavigator() {
+  const { isDark } = useTheme();
+
+  return (
+    <>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <AuthGuard>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="auth" />
+          <Stack.Screen name="perfume/[id]" />
+          <Stack.Screen name="history" />
+          <Stack.Screen name="favorites" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="stats" />
+        </Stack>
+      </AuthGuard>
+    </>
+  );
+}
+
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <FavoritesProvider>
-        <HistoryProvider>
-          <ReviewsProvider>
-            <CollectionProvider>
-              <AuthGuard>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="auth" />
-                  <Stack.Screen name="perfume/[id]" />
-                  <Stack.Screen name="history" />
-                  <Stack.Screen name="favorites" />
-                  <Stack.Screen name="settings" />
-                  <Stack.Screen name="stats" />
-                </Stack>
-              </AuthGuard>
-            </CollectionProvider>
-          </ReviewsProvider>
-        </HistoryProvider>
-      </FavoritesProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <FavoritesProvider>
+          <HistoryProvider>
+            <ReviewsProvider>
+              <CollectionProvider>
+                <AppNavigator />
+              </CollectionProvider>
+            </ReviewsProvider>
+          </HistoryProvider>
+        </FavoritesProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
