@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useHistory } from "../src/context/HistoryContext";
-import { theme } from "../src/theme";
+import { useAppTheme } from "../src/theme";
 
 const getConditionEmoji = (condition: string | null): string => {
   if (!condition) return "🌤️";
@@ -53,6 +53,9 @@ const formatTime = (dateStr: string): string => {
 export default function HistoryScreen() {
     const router = useRouter();
     const { history, loading, removeEntry, clearAll } = useHistory();
+    const colors = useAppTheme();
+    const styles = makeStyles(colors);
+
     const handleClearAll = () => {
         Alert.alert(
             "Effacer l'historique",
@@ -90,7 +93,7 @@ export default function HistoryScreen() {
 
         {/* États: chargement, vide, liste */}
         {loading ? (
-          <ActivityIndicator color={theme.colors.gold} style={{ marginTop: 40 }} />
+          <ActivityIndicator color={colors.gold} style={{ marginTop: 40 }} />
         ) : history.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyEmoji}>📭</Text>
@@ -146,19 +149,20 @@ export default function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  // Layout
-  wrapper: { 
-    flex: 1,
-    backgroundColor: theme.colors.background 
-},
-  container: { 
-    flex: 1 
-},
-  content: { 
-    padding: 20, 
-    paddingTop: 60, 
-    paddingBottom: 40 
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
+    // Layout
+    wrapper: { 
+      flex: 1,
+      backgroundColor: colors.background 
+  },
+    container: { 
+      flex: 1 
+  },
+    content: { 
+      padding: 20, 
+      paddingTop: 60, 
+      paddingBottom: 40 
   },
 
   // Header
@@ -171,11 +175,11 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 22,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   clearButton: {
     fontSize: 13,
-    color: theme.colors.error,
+    color: colors.error,
     fontWeight: "600",
   },
 
@@ -191,12 +195,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: "center",
     lineHeight: 22,
   },
@@ -208,20 +212,20 @@ const styles = StyleSheet.create({
   groupTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: theme.colors.gold,
+    color: colors.gold,
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 10,
   },
   card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.card,
+    borderRadius: 12,
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: theme.colors.gold15,
+    borderColor: colors.gold15,
     gap: 12,
   },
   cardLeft: {
@@ -236,13 +240,13 @@ const styles = StyleSheet.create({
   },
   city: {
     fontSize: 10,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   temp: {
     fontSize: 12,
     fontWeight: "bold",
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   cardCenter: { 
     flex: 1 
@@ -250,29 +254,29 @@ const styles = StyleSheet.create({
   perfumeName: {
     fontSize: 15,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   perfumeBrand: {
     fontSize: 12,
-    color: theme.colors.gold,
+    color: colors.gold,
     marginTop: 2,
   },
   time: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 4,
   },
   deleteButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: theme.colors.error10,
+    backgroundColor: colors.error10,
     justifyContent: "center",
     alignItems: "center",
   },
   deleteText: {
     fontSize: 12,
-    color: theme.colors.error,
+    color: colors.error,
     fontWeight: "bold",
   },
 
@@ -281,14 +285,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   backText: {
     fontSize: 18,
-    color: theme.colors.gold,
+    color: colors.gold,
   },
 });
