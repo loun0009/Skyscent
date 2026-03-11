@@ -3,7 +3,7 @@ import { useNotifications } from "../src/hooks/useNotifications";
 import { usePerfumes } from "../src/hooks/usePerfumes";
 import { useWeather } from "../src/hooks/useWeather";
 import { NotificationSettings } from "../src/components/NotificationSettings";
-import { theme } from "../src/theme";
+import { useAppTheme } from "../src/theme";
 import { router } from "expo-router/build/exports";
 
 export default function SettingsScreen() {
@@ -11,6 +11,8 @@ export default function SettingsScreen() {
     const { recommendations } = usePerfumes(weather);
     const { settings, isScheduled, enableNotifications, disableNotifications, updateTime } = useNotifications();
     const topPerfume = recommendations.length > 0 ? recommendations[0] : null;
+    const colors = useAppTheme();
+    const styles = makeStyles(colors);
 
     return (
         <View style={styles.wrapper}>
@@ -48,11 +50,12 @@ export default function SettingsScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
   // Layout
   wrapper: { 
     flex: 1, 
-    backgroundColor: theme.colors.background 
+    backgroundColor: colors.background 
 },
   container: { 
     flex: 1 
@@ -67,24 +70,24 @@ const styles = StyleSheet.create({
   headline: { 
     fontSize: 22, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary, 
+    color: colors.textPrimary, 
 },
 
   // Carte info
   infoCard: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
   },
   infoTitle: { 
     fontSize: 15, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary, 
+    color: colors.textPrimary, 
     marginBottom: 8 
 },
   infoText: { 
     fontSize: 13, 
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     lineHeight: 20 
 },
 
@@ -93,15 +96,15 @@ backButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   backText: {
     fontSize: 18,
-    color: theme.colors.gold,
+    color: colors.gold,
   },
    header: {
     flexDirection: "row",

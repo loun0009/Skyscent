@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { theme } from "../theme";
+import { AppTheme, useAppTheme } from "../theme";
 
 interface Props {
     rating: number;
@@ -10,6 +10,9 @@ interface Props {
 }
 
 export const StarRating = ({ rating, maxStars = 5, size = 24, onRate, readonly = false }: Props) => {
+    const colors = useAppTheme();
+    const styles = makeStyles(colors);
+
     return (
         <View style={styles.row}>
             {Array.from({ length: maxStars}).map((_, i) => {
@@ -30,12 +33,12 @@ export const StarRating = ({ rating, maxStars = 5, size = 24, onRate, readonly =
     );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppTheme) => StyleSheet.create({
     row: {
         flexDirection: "row",
         gap: 4,
     },
     star: {
-        color: theme.colors.gold,
+        color: colors.gold,
     },
 });

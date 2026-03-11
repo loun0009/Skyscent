@@ -11,7 +11,7 @@ import { ErrorMessage } from "../../src/components/errorBoundary";
 import { Perfume } from "../../src/types";
 import { useFavorites } from "../../src/context/FavoritesContext";
 import { useEffect, useRef } from "react";
-import { theme } from "../../src/theme";
+import { useAppTheme } from "../../src/theme";
 import { useAuth } from "../../src/context/AuthContext";
 import { useCollection } from "../../src/context/CollectionContext";
 
@@ -26,6 +26,8 @@ export default function HomeScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-20)).current;
   const { collection } = useCollection();
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
 
   const hasCollection = collection.length > 0;
 
@@ -60,7 +62,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.wrapper}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
@@ -115,7 +117,7 @@ export default function HomeScreen() {
                 >
                   <View style={styles.collectionItemImage}>
                     <Image
-                        source={{ uri: perfume.image_url || ""}}
+                        source={{ uri: perfume.image_url || undefined }}
                         style={{ width: 70, height: 70 }}
                         resizeMode="contain"
                       />
@@ -169,70 +171,72 @@ export default function HomeScreen() {
 }
 
 
-const styles = StyleSheet.create({
-  // Layout
-  wrapper: { 
-    flex: 1, 
-    backgroundColor: theme.colors.background 
-  },
-  container: { 
-    flex: 1 
-  },
-  content: { 
-    padding: theme.spacing.md, 
-    paddingTop: 60, 
-    paddingBottom: 40 
-  },
+
+const makeStyles = (colors: ReturnType<typeof useAppTheme>) =>
+  StyleSheet.create({
+    // Layout
+    wrapper: { 
+      flex: 1, 
+      backgroundColor: colors.background 
+    },
+    container: { 
+      flex: 1 
+    },
+    content: { 
+      padding: 20, 
+      paddingTop: 60, 
+      paddingBottom: 40 
+    },
 
   // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: theme.spacing.lg,
+    marginBottom: 24,
   },
   greeting: { 
     fontSize: 14, 
-    color: theme.colors.gold, 
+    color: colors.gold, 
     marginBottom: 4 
   },
   headline: { 
     fontSize: 26, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary 
+    color: colors.text 
   },
   refreshButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
     justifyContent: "center",
     alignItems: "center",
   },
   refreshText: { 
     fontSize: 20, 
-    color: theme.colors.gold 
+    color: colors.gold 
   },
 
   // Recommandations & footer
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.md,
+    color: colors.text,
+    marginBottom: 16,
   },
   footer: {
     alignItems: "center",
-    marginTop: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
+    marginTop: 24,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.gold10,
+    borderTopColor: colors.gold10,
   },
   footerText: { 
     fontSize: 12, 
-    color: theme.colors.textMuted 
+    color: colors.textMuted 
   },
 
   // Collection
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
   collectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
     marginBottom: 12,
   },
   collectionScroll: {
@@ -257,24 +261,24 @@ const styles = StyleSheet.create({
   collectionItemImage: {
     width: 90,
     height: 90,
-    backgroundColor: theme.colors.white,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.white,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
     overflow: "hidden",
   },
   collectionItemName: {
     fontSize: 11,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
     textAlign: "center",
     width: 90,
   },
   collectionItemBrand: {
     fontSize: 10,
-    color: theme.colors.gold,
+    color: colors.gold,
     textAlign: "center",
     width: 90,
   },

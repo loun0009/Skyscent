@@ -3,11 +3,13 @@ import { useRouter } from "expo-router";
 import { useFavorites } from "../src/context/FavoritesContext";
 import { PerfumeCard } from "../src/components/perfumeCard";
 import { Perfume } from "../src/types";
-import { theme } from "../src/theme";
+import { useAppTheme } from "../src/theme";
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favoritePerfumes, isFavorite, toggle, loading } = useFavorites();
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
 
   const handlePress = (perfume: Perfume) => {
     router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } });
@@ -55,25 +57,26 @@ export default function FavoritesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  // Layout
-  wrapper: { 
-    flex: 1, 
-    backgroundColor: theme.colors.background 
-  },
-  container: { flex: 1 },
-  content: { 
-    padding: 20, 
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
+    // Layout
+    wrapper: { 
+      flex: 1, 
+      backgroundColor: colors.background 
+    },
+    container: { flex: 1 },
+    content: { 
+      padding: 20, 
     paddingTop: 60, 
     paddingBottom: 40 
   },
 
-  // Header
-  headline: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    color: theme.colors.textPrimary, 
-  },
+    // Header
+    headline: { 
+      fontSize: 22, 
+      fontWeight: "bold", 
+      color: colors.text, 
+    },
 
   // État vide
   empty: { 
@@ -88,12 +91,12 @@ const styles = StyleSheet.create({
   emptyTitle: { 
     fontSize: 18, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary, 
+    color: colors.text, 
     marginBottom: 8 
   },
   emptySubtitle: { 
     fontSize: 14, 
-    color: theme.colors.textSecondary, 
+    color:  colors.textSecondary, 
     textAlign: "center", 
     lineHeight: 22 
   },
@@ -103,15 +106,15 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   backText: {
     fontSize: 18,
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   header: {
     flexDirection: "row",

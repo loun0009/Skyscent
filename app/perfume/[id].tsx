@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchPerfumeById } from "../../src/services/perfumesApi";
 import { Perfume } from "../../src/types";
-import { theme } from "../../src/theme";
+import { AppTheme, useAppTheme } from "../../src/theme";
 import { useHistory } from "../../src/context/HistoryContext";
 import { useWeather } from "../../src/hooks/useWeather";
 import { useFavorites } from "../../src/context/FavoritesContext";
@@ -12,22 +12,26 @@ import { useReviews } from "../../src/context/ReviewsContext";
 import { StarRating } from "../../src/components/starRating";
 import { useCollection } from "../../src/context/CollectionContext";
 
-const SEASON_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
-  spring: { emoji: "🌱", label: "Printemps", color: theme.colors.seasonSpring },
-  summer: { emoji: "☀️", label: "Été", color: theme.colors.seasonSummer },
-  autumn: { emoji: "🍂", label: "Automne", color: theme.colors.seasonAutumn },
-  winter: { emoji: "❄️", label: "Hiver", color: theme.colors.seasonWinter },
-};
+const getSeasonConfig = (colors: AppTheme): Record<string, { emoji: string; label: string; color: string }> => ({
+  spring: { emoji: "🌱", label: "Printemps", color: colors.seasonSpring },
+  summer: { emoji: "☀️", label: "Été", color: colors.seasonSummer },
+  autumn: { emoji: "🍂", label: "Automne", color: colors.seasonAutumn },
+  winter: { emoji: "❄️", label: "Hiver", color: colors.seasonWinter },
+});
 
-const INTENSITY_CONFIG: Record<string, { emoji: string; color: string; dot: string }> = {
-  "légère":  { emoji: "🌸", color: theme.colors.intensityLightBg, dot: theme.colors.intensityLightDot },
-  "modérée": { emoji: "🌺", color: theme.colors.intensityMediumBg, dot: theme.colors.intensityMediumDot },
-  "intense": { emoji: "🔥", color: theme.colors.intensityStrongBg, dot: theme.colors.intensityStrongDot },
-};
+const getIntensityConfig = (colors: AppTheme): Record<string, { emoji: string; color: string; dot: string }> => ({
+  "légère": { emoji: "🌸", color: colors.intensityLightBg, dot: colors.intensityLightDot },
+  "modérée": { emoji: "🌺", color: colors.intensityMediumBg, dot: colors.intensityMediumDot },
+  "intense": { emoji: "🔥", color: colors.intensityStrongBg, dot: colors.intensityStrongDot },
+});
 
 export default function PerfumeDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
+  const SEASON_CONFIG = getSeasonConfig(colors);
+  const INTENSITY_CONFIG = getIntensityConfig(colors);
   const [perfume, setPerfume] = useState<Perfume | null>(null);
   const [loading, setLoading] = useState(true);
   const { addEntry, checkWornToday } = useHistory();
@@ -89,7 +93,7 @@ export default function PerfumeDetailScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.gold} />
+        <ActivityIndicator size="large" color={colors.gold} />
       </View>
     );
   }
@@ -108,7 +112,7 @@ export default function PerfumeDetailScreen() {
     ? weather.temperature >= perfume.temp_min && weather.temperature <= perfume.temp_max
     : false;
   const weatherScore = !weather ? null : isCompatible ? "Parfait aujourd'hui" : "Peu adapté aujourd'hui";
-  const weatherScoreColor = isCompatible ? theme.colors.success : theme.colors.textMuted;
+  const weatherScoreColor = isCompatible ? colors.success : colors.textMuted;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -121,7 +125,7 @@ export default function PerfumeDetailScreen() {
           resizeMode="contain"
         />
         <LinearGradient
-          colors={["transparent", theme.colors.overlayDark, theme.colors.background]}
+          colors={["transparent", colors.overlayDark, colors.background]}
           style={styles.gradient}
         />
 
@@ -143,7 +147,12 @@ export default function PerfumeDetailScreen() {
 
         {/* Nom sur l'image */}
         <View style={styles.imageOverlayContent}>
-          {/* Bouton collection */}
+          <Text style={styles.brand}>{perfume.brand}</Text>
+          <Text style={styles.name}>{perfume.name}</Text>
+        </View>
+      </View>
+
+        {/* Bouton collection */}
         <TouchableOpacity
           style={[styles.collectionButton, inCollection && styles.collectionButtonActive]}
           onPress={() => toggleCollection(perfume.id)}
@@ -152,10 +161,6 @@ export default function PerfumeDetailScreen() {
             {inCollection ? "💎 Dans ma collection" : "➕ Ajouter à ma collection"}
           </Text>
         </TouchableOpacity>
-          <Text style={styles.brand}>{perfume.brand}</Text>
-          <Text style={styles.name}>{perfume.name}</Text>
-        </View>
-      </View>
 
       <Animated.View
         style={[
@@ -165,7 +170,7 @@ export default function PerfumeDetailScreen() {
       >
         {/* Score météo du jour */}
         {weather && (
-          <View style={[styles.weatherBadge, { borderColor: isCompatible ? theme.colors.success : theme.colors.textMuted }]}>
+          <View style={[styles.weatherBadge, { borderColor: isCompatible ? colors.success : colors.textMuted }]}>
             <Text style={styles.weatherBadgeEmoji}>
               {isCompatible ? "✅" : "⚠️"}
             </Text>
@@ -219,12 +224,12 @@ export default function PerfumeDetailScreen() {
                   style={[
                     styles.seasonBadge,
                     active
-                      ? { backgroundColor: config.color, borderColor: theme.colors.gold }
-                      : { backgroundColor: "transparent", borderColor: theme.colors.textMuted, opacity: 0.3 }
+                      ? { backgroundColor: config.color, borderColor: colors.gold }
+                      : { backgroundColor: "transparent", borderColor: colors.textMuted, opacity: 0.3 }
                   ]}
                 >
                   <Text style={styles.seasonBadgeEmoji}>{config.emoji}</Text>
-                  <Text style={[styles.seasonBadgeLabel, { color: active ? theme.colors.textPrimary : theme.colors.textMuted }]}>
+                  <Text style={[styles.seasonBadgeLabel, { color: active ? colors.text : colors.textMuted }]}>
                     {config.label}
                   </Text>
                 </View>
@@ -307,7 +312,7 @@ export default function PerfumeDetailScreen() {
               <TextInput
                 style={styles.reviewInput}
                 placeholder="Ajouter un commentaire... (optionnel)"
-                placeholderTextColor={theme.colors.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 value={reviewComment}
                 onChangeText={setReviewComment}
                 multiline
@@ -396,24 +401,24 @@ export default function PerfumeDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppTheme) => StyleSheet.create({
   // Layout
   center: { 
     flex: 1, 
     justifyContent: "center", 
     alignItems: "center",
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   container: { 
     flex: 1, 
-    backgroundColor: theme.colors.background 
+    backgroundColor: colors.background 
   },
 
   // Image
   imageContainer: { 
     height: 380, 
     position: "relative", 
-    backgroundColor: theme.colors.cardElevated 
+    backgroundColor: colors.surfaceLight 
   },
   image: { 
     width: "100%", 
@@ -431,15 +436,15 @@ const styles = StyleSheet.create({
     width: 38, 
     height: 38, 
     borderRadius: 19,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     justifyContent: "center", 
     alignItems: "center",
     borderWidth: 1, 
-    borderColor: theme.colors.gold30,
+    borderColor: colors.gold30,
   },
   backText: { 
     fontSize: 18, 
-    color: theme.colors.gold 
+    color: colors.gold 
   },
   favoriteButton: {
     position: "absolute", 
@@ -448,27 +453,27 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     alignItems: "center", 
     gap: 6,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     paddingHorizontal: 14, 
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1, 
-    borderColor: theme.colors.gold,
+    borderColor: colors.gold,
   },
   favoriteButtonActive: {
-    backgroundColor: theme.colors.background,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.background,
+    borderColor: colors.gold,
   },
   favoriteText: { 
     fontSize: 16 
   },
   favoriteLabel: { 
     fontSize: 12, 
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     fontWeight: "600" 
   },
   favoriteLabelActive: { 
-    color: theme.colors.gold 
+    color: colors.gold 
   },
   imageOverlayContent: {
     position: "absolute", 
@@ -478,20 +483,20 @@ const styles = StyleSheet.create({
   },
   brand: { 
     fontSize: 14, 
-    color: theme.colors.gold, 
+    color: colors.text, 
     fontWeight: "600", 
     marginBottom: 4 
   },
   name: { 
     fontSize: 30, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary 
+    color: colors.text 
   },
 
   // Contenu
   content: { 
-    padding: theme.spacing.lg, 
-    paddingTop: theme.spacing.md 
+    padding: 16, 
+    paddingTop: 12 
   },
 
   // Score météo
@@ -499,8 +504,8 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     alignItems: "center", 
     gap: 12,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md, 
+    backgroundColor: colors.card,
+    borderRadius: 12, 
     padding: 14,
     marginBottom: 20, 
     borderWidth: 1,
@@ -514,14 +519,14 @@ const styles = StyleSheet.create({
   },
   weatherBadgeDesc: { 
     fontSize: 12, 
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     marginTop: 2 
   },
 
   // Description
   description: { 
     fontSize: 15, 
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     lineHeight: 24, 
     marginBottom: 24 
   },
@@ -530,7 +535,7 @@ const styles = StyleSheet.create({
   intensityCard: {
     flexDirection: "row", 
     alignItems: "center",
-    borderRadius: theme.radius.md, 
+    borderRadius: 12, 
     padding: 12,
     marginBottom: 24,  
     justifyContent: "space-between",
@@ -540,21 +545,21 @@ const styles = StyleSheet.create({
   },
   intensityLabel: { 
     fontSize: 10, 
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     textTransform: "uppercase", 
     letterSpacing: 0.5 
   },
   intensityValue: { 
     fontSize: 12, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary, 
+    color: colors.text, 
     marginTop: 2,
     flexShrink: 1, 
   },
   intensityDivider: { 
     width: 1, 
     height: 30, 
-    backgroundColor: theme.colors.gold20,
+    backgroundColor: colors.gold20,
       marginHorizontal: 8, 
   },
 
@@ -565,7 +570,7 @@ const styles = StyleSheet.create({
   sectionTitle: { 
     fontSize: 12, 
     fontWeight: "bold", 
-    color: theme.colors.gold,
+    color: colors.gold,
     textTransform: "uppercase", 
     letterSpacing: 1, 
     marginBottom: 12 
@@ -580,7 +585,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     alignItems: "center", 
     padding: 10,
-    borderRadius: theme.radius.md, 
+    borderRadius: 12, 
     borderWidth: 1, 
     gap: 4,
   },
@@ -599,15 +604,15 @@ const styles = StyleSheet.create({
     gap: 8 
   },
   tag: { 
-    backgroundColor: theme.colors.gold08,
+    backgroundColor: colors.gold10,
     borderWidth: 1, 
-    borderColor: theme.colors.gold25,
+    borderColor: colors.gold30,
     paddingHorizontal: 12, 
     paddingVertical: 6, 
     borderRadius: 20 
   },
   tagText: {
-    color: theme.colors.gold, 
+    color: colors.gold, 
     fontSize: 13, 
     fontWeight: "500" 
   },
@@ -620,26 +625,26 @@ const styles = StyleSheet.create({
     borderRadius: 20, 
     marginBottom: 32,
     borderWidth: 1, 
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   wornButtonActive: {
-    borderColor: theme.colors.success,
+    borderColor: colors.success,
   },
   wornButtonDisabled: { 
-    borderColor: theme.colors.textMuted 
+    borderColor: colors.textMuted 
   },
   wornButtonText: { 
     fontSize: 13, 
-    color: theme.colors.textSecondary 
+    color: colors.textSecondary 
   },
   wornButtonTextDisabled: { 
-    color: theme.colors.textMuted 
+    color: colors.textMuted 
   },
 
   // Erreur & infos génériques
   errorText: {
     fontSize: 16,
-    color: theme.colors.error,
+    color: colors.error,
     fontWeight: "600"
   },
   infoRow: {
@@ -647,14 +652,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", 
     paddingVertical: 10, 
     borderBottomWidth: 1, 
-    borderBottomColor: theme.colors.gold10
+    borderBottomColor: colors.gold10
   },
   infoLabel: {
-    color: theme.colors.textSecondary, 
+    color: colors.textSecondary, 
     fontSize: 14 
   },
   infoValue: {
-    color: theme.colors.textPrimary, 
+    color: colors.text, 
     fontSize: 14, 
     fontWeight: "600" 
   },
@@ -665,30 +670,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     marginBottom: 16,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     padding: 14,
-    borderRadius: theme.radius.md,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.gold15,
+    borderColor: colors.gold15,
   },
   ratingAverage: {
     fontSize: 36,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   ratingCount: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 2,
   },
 
   // Mon avis
   myReviewCard: {
-    backgroundColor: theme.colors.gold08,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.gold10,
+    borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: theme.colors.gold30,
+    borderColor: colors.gold30,
     marginBottom: 12,
     gap: 8,
   },
@@ -700,7 +705,7 @@ const styles = StyleSheet.create({
   myReviewTitle: {
     fontSize: 13,
     fontWeight: "bold",
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   myReviewActions: {
     flexDirection: "row",
@@ -708,14 +713,14 @@ const styles = StyleSheet.create({
   },
   editReviewText: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   },
   deleteReviewText: {
     fontSize: 14,
   },
   myReviewComment: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 20,
     marginTop: 4,
   },
@@ -723,42 +728,42 @@ const styles = StyleSheet.create({
   // Bouton ajouter avis
   addReviewButton: {
     borderWidth: 1,
-    borderColor: theme.colors.gold30,
+    borderColor: colors.gold30,
     borderStyle: "dashed",
-    borderRadius: theme.radius.md,
+    borderRadius: 12,
     padding: 14,
     alignItems: "center",
     marginBottom: 12,
   },
   addReviewText: {
-    color: theme.colors.gold,
+    color: colors.gold,
     fontSize: 14,
     fontWeight: "600",
   },
 
   // Formulaire avis
   reviewForm: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.card,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
     marginBottom: 16,
     gap: 12,
   },
   reviewFormTitle: {
     fontSize: 14,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   reviewInput: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.radius.sm,
+    backgroundColor: colors.background,
+    borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    color: theme.colors.textPrimary,
+    color: colors.text,
     borderWidth: 1,
-    borderColor: theme.colors.gold15,
+    borderColor: colors.gold15,
     minHeight: 80,
   },
   reviewFormActions: {
@@ -768,38 +773,38 @@ const styles = StyleSheet.create({
   cancelReviewButton: {
     flex: 1,
     padding: 12,
-    borderRadius: theme.radius.sm,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: theme.colors.textMuted,
+    borderColor: colors.textMuted,
     alignItems: "center",
   },
   cancelReviewText: {
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: "600",
   },
   submitReviewButton: {
     flex: 2,
     padding: 12,
-    borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.gold,
+    borderRadius: 8,
+    backgroundColor: colors.gold,
     alignItems: "center",
   },
   submitDisabled: {
     opacity: 0.4,
   },
   submitReviewText: {
-    color: theme.colors.background,
+    color: colors.background,
     fontWeight: "bold",
   },
 
   // Cartes avis communauté
   reviewCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.card,
+    borderRadius: 12,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: theme.colors.gold10,
+    borderColor: colors.gold10,
     gap: 8,
   },
   reviewCardHeader: {
@@ -811,14 +816,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.gold,
+    backgroundColor: colors.gold,
     justifyContent: "center",
     alignItems: "center",
   },
   reviewAvatarText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: theme.colors.background,
+    color: colors.background,
   },
   reviewCardInfo: {
     flex: 1,
@@ -827,20 +832,20 @@ const styles = StyleSheet.create({
   reviewAuthor: {
     fontSize: 13,
     fontWeight: "600",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   reviewDate: {
     fontSize: 11,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
   },
   reviewComment: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   noReviews: {
     fontSize: 13,
-    color: theme.colors.textMuted,
+    color: colors.textMuted,
     textAlign: "center",
     paddingVertical: 16,
   },
@@ -851,15 +856,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: theme.colors.gold30,
+    borderColor: colors.gold30,
   },
   collectionButtonActive: {
-    backgroundColor: theme.colors.gold10,
-    borderColor: theme.colors.gold,
+    backgroundColor: colors.gold10,
+    borderColor: colors.gold,
   },
   collectionButtonText: {
     fontSize: 13,
-    color: theme.colors.gold,
+    color: colors.text,
     fontWeight: "600",
   },
 });

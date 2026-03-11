@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { getUserStats, UserStats } from "../src/services/statsService";
-import { theme } from "../src/theme";
+import { useAppTheme } from "../src/theme";
 
 const SEASON_LABEL: Record<string, string> = {
   spring: "🌱 Printemps",
@@ -18,12 +18,13 @@ const INTENSITY_LABEL: Record<string, string> = {
 };
 
 const StatCard = ({
-  emoji, title, value, subtitle,
+  emoji, title, value, subtitle, styles,
 }: {
   emoji: string;
   title: string;
   value: string;
   subtitle?: string;
+  styles: ReturnType<typeof makeStyles>;
 }) => (
   <View style={styles.statCard}>
     <Text style={styles.statEmoji}>{emoji}</Text>
@@ -39,6 +40,8 @@ export default function StatsScreen() {
   const router = useRouter();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
 
   useEffect(() => {
     const load = async () => {
@@ -66,7 +69,7 @@ export default function StatsScreen() {
         </View>
 
         {loading ? (
-          <ActivityIndicator color={theme.colors.gold} style={{ marginTop: 40 }} />
+          <ActivityIndicator color={colors.gold} style={{ marginTop: 40 }} />
         ) : !stats || stats.totalWorn === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyEmoji}>📭</Text>
@@ -105,6 +108,7 @@ export default function StatsScreen() {
 
             {stats.favoritePerfume && (
               <StatCard
+                styles={styles}
                 emoji="🏆"
                 title="Parfum le plus porté"
                 value={stats.favoritePerfume.name}
@@ -114,6 +118,7 @@ export default function StatsScreen() {
 
             {stats.favoriteBrand && (
               <StatCard
+                styles={styles}
                 emoji="🏅"
                 title="Marque favorite"
                 value={stats.favoriteBrand.name}
@@ -123,6 +128,7 @@ export default function StatsScreen() {
 
             {stats.favoriteIntensity && (
               <StatCard
+                styles={styles}
                 emoji="💪"
                 title="Intensité favorite"
                 value={INTENSITY_LABEL[stats.favoriteIntensity.value] ?? stats.favoriteIntensity.value}
@@ -132,6 +138,7 @@ export default function StatsScreen() {
 
             {stats.favoriteSeason && (
               <StatCard
+                styles={styles}
                 emoji="🗓️"
                 title="Saison la plus active"
                 value={SEASON_LABEL[stats.favoriteSeason.value] ?? stats.favoriteSeason.value}
@@ -145,17 +152,18 @@ export default function StatsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: { 
-    flex: 1, 
-    backgroundColor: theme.colors.background 
-  },
-  container: { 
-    flex: 1 
-  },
-  content: { 
-    padding: 20, 
-    paddingTop: 60, 
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
+    wrapper: { 
+      flex: 1, 
+      backgroundColor: colors.background 
+    },
+    container: { 
+      flex: 1 
+    },
+    content: { 
+      padding: 20, 
+      paddingTop: 60, 
     paddingBottom: 40 
   },
   header: {
@@ -168,25 +176,25 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.colors.card,
+    backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   backText: { 
     fontSize: 18, 
-    color: theme.colors.gold 
+    color: colors.gold 
   },
   headline: { 
     fontSize: 22, 
     fontWeight: "bold", 
-    color: theme.colors.textPrimary 
+    color: colors.textPrimary 
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: "bold",
-    color: theme.colors.gold,
+    color: colors.gold,
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 12,
@@ -203,35 +211,35 @@ const styles = StyleSheet.create({
   keyStatCard: {
     flex: 1,
     minWidth: "22%",
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.card,
+    borderRadius: 16,
     padding: 14,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: theme.colors.gold15,
+    borderColor: colors.gold15,
     gap: 4,
   },
   keyStatValue: {
     fontSize: 24,
     fontWeight: "bold",
-    color: theme.colors.gold,
+    color: colors.gold,
   },
   keyStatLabel: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: "center",
   },
 
   // Stat cards
   statCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
+    backgroundColor: colors.card,
+    borderRadius: 16,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: theme.colors.gold15,
+    borderColor: colors.gold15,
     gap: 14,
   },
   statEmoji: { 
@@ -242,7 +250,7 @@ const styles = StyleSheet.create({
   },
   statTitle: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -250,11 +258,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.textPrimary,
   },
   statSubtitle: {
     fontSize: 12,
-    color: theme.colors.gold,
+    color: colors.gold,
     marginTop: 2,
   },
 
@@ -270,12 +278,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: "center",
     lineHeight: 22,
   },

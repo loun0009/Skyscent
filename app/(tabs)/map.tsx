@@ -3,7 +3,8 @@ import MapView, { Marker, Circle, PROVIDER_GOOGLE } from "react-native-maps";
 import { useState } from "react";
 import { useNearbyStores } from "../../src/hooks/useNearByStores";
 import { PerfumeStore } from "../../src/services/placesServices";
-import { theme } from "../../src/theme";
+import { useAppTheme } from "../../src/theme";
+import { useTheme } from "../../src/context/ThemeContext";
 
 const RADIUS_OPTIONS = [
   { label: "500m", value: 500 },
@@ -13,7 +14,6 @@ const RADIUS_OPTIONS = [
 ];
 
 const openInMaps = (store: PerfumeStore) => {
-    // Ouvre l'application de cartographie native avec les directions vers la parfumerie
   const url = Platform.select({
     ios: `maps://app?daddr=${store.latitude},${store.longitude}`,
     android: `google.navigation:q=${store.latitude},${store.longitude}`,
@@ -21,17 +21,34 @@ const openInMaps = (store: PerfumeStore) => {
   if (url) Linking.openURL(url);
 };
 
+const getMapStyle = (colors: ReturnType<typeof useAppTheme>, isDark: boolean) => {
+  if (!isDark) return []; // En light mode, on utilise le style Google Maps par défaut
+  return [
+    { elementType: "geometry", stylers: [{ color: colors.background }] },
+    { elementType: "labels.text.fill", stylers: [{ color: colors.textSecondary }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: colors.background }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: colors.surface }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: colors.surfaceLight }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: colors.card }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: colors.mapWater }] },
+    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: colors.mapPark }] },
+  ];
+};
+
 export default function MapScreen() {
-  // Utilise le hook personnalisé pour obtenir les parfumeries à proximité et la localisation de l'utilisateur
   const { stores, loading, error, userLocation, refresh, radius, setRadius } =
     useNearbyStores();
-  // Stocke la parfumerie sélectionnée pour afficher ses détails
   const [selectedStore, setSelectedStore] = useState<PerfumeStore | null>(null);
+
+  const colors = useAppTheme();
+  const { isDark } = useTheme();
+  const styles = makeStyles(colors);
+  const mapStyle = getMapStyle(colors, isDark);
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.gold} />
+        <ActivityIndicator size="large" color={colors.gold} />
         <Text style={styles.loadingText}>Recherche des parfumeries...</Text>
       </View>
     );
@@ -63,21 +80,21 @@ export default function MapScreen() {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-        customMapStyle={darkMapStyle}
+        customMapStyle={mapStyle}
       >
         {/* Position utilisateur */}
         <Marker
           coordinate={userLocation}
           title="Vous êtes ici"
-          pinColor={theme.colors.gold}
+          pinColor={colors.gold}
         />
 
         {/* Cercle de rayon */}
         <Circle
           center={userLocation}
           radius={radius}
-          strokeColor={theme.colors.gold40}
-          fillColor={theme.colors.gold05}
+          strokeColor={colors.gold40}
+          fillColor={colors.gold05}
         />
 
         {/* Marqueurs parfumeries */}
@@ -90,9 +107,7 @@ export default function MapScreen() {
             }}
             title={store.name}
             description={store.address}
-            pinColor={
-              selectedStore?.id === store.id ? theme.colors.error : theme.colors.gold
-            }
+            pinColor={selectedStore?.id === store.id ? colors.error : colors.gold}
             onPress={() => setSelectedStore(store)}
           />
         ))}
@@ -143,8 +158,8 @@ export default function MapScreen() {
                     styles.openBadge,
                     {
                       backgroundColor: selectedStore.isOpen
-                        ? theme.colors.success20
-                        : theme.colors.error20,
+                        ? colors.success20
+                        : colors.error20,
                     },
                   ]}
                 >
@@ -153,8 +168,8 @@ export default function MapScreen() {
                       styles.openText,
                       {
                         color: selectedStore.isOpen
-                          ? theme.colors.success
-                          : theme.colors.error,
+                          ? colors.success
+                          : colors.error,
                       },
                     ]}
                   >
@@ -215,210 +230,190 @@ export default function MapScreen() {
   );
 }
 
-// Style sombre pour Google Maps
-const darkMapStyle = [
-  { elementType: "geometry", stylers: [{ color: theme.colors.background }] },
-  { elementType: "labels.text.fill", stylers: [{ color: theme.colors.textSecondary }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: theme.colors.background }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: theme.colors.card }] },
-  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: theme.colors.surface }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: theme.colors.cardElevated }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: theme.colors.mapWater }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: theme.colors.mapPark }] },
-];
-
-const styles = StyleSheet.create({
-  // Layout
-  wrapper: { 
-    flex: 1, 
-    backgroundColor: theme.colors.background 
-},
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-    padding: 24,
-  },
-  map: { 
-    flex: 1 
-},
-
-  // États (chargement/erreur)
-  loadingText: {
-    color: theme.colors.textSecondary,
-    marginTop: 12,
-    fontSize: 14,
-  },
-  errorEmoji: { 
-    fontSize: 48, 
-    marginBottom: 16 
-},
-  errorText: {
-    color: theme.colors.textSecondary,
-    textAlign: "center",
-    marginBottom: 20,
-    fontSize: 14,
-  },
-  retryButton: {
-    backgroundColor: theme.colors.gold10,
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  retryText: { 
-    color: theme.colors.gold, 
-    fontWeight: "600" 
-  },
-
-  // Overlay carte
-  header: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    right: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-    padding: 14,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.gold20,
-  },
-  headline: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: theme.colors.textPrimary,
-  },
-  count: { 
-    fontSize: 13, 
-    color: theme.colors.gold 
-  },
-  radiusContainer: {
-    position: "absolute",
-    top: 120,
-    left: 20,
-    right: 20,
-    flexDirection: "row",
-    gap: 8,
-    justifyContent: "center",
-  },
-  radiusPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.gold20,
-  },
-  radiusPillActive: {
-    backgroundColor: theme.colors.gold,
-    borderColor: theme.colors.gold,
-  },
-  radiusText: { 
-    color: theme.colors.textSecondary, 
-    fontSize: 13, 
-    fontWeight: "600" 
-  },
-  radiusTextActive: { 
-    color: theme.colors.background 
-},
-
-  // Carte magasin sélectionné
-  storeCard: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: theme.colors.gold20,
-    gap: 12,
-  },
-  storeInfo: { 
-    flex: 1 
-},
-  storeHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 4,
-  },
-  storeName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: theme.colors.textPrimary,
-    flex: 1,
-  },
-  openBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  openText: { 
-    fontSize: 11, 
-    fontWeight: "600" 
-  },
-  storeAddress: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginBottom: 4,
-  },
-  storeRating: { 
-    fontSize: 12, 
-    color: theme.colors.gold 
-  },
-  directionsButton: {
-    backgroundColor: theme.colors.gold,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  directionsText: {
-    color: theme.colors.background,
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-
-  // Liste horizontale des magasins
-  storeList: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
-  },
-  storeListContent: { 
-    paddingHorizontal: 20, 
-    gap: 10 
-  },
-  storeListItem: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    padding: 12,
-    width: 180,
-    borderWidth: 1,
-    borderColor: theme.colors.gold15,
-  },
-  storeListName: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: theme.colors.textPrimary,
-    marginBottom: 4,
-  },
-  storeListAddress: {
-    fontSize: 11,
-    color: theme.colors.textSecondary,
-    marginBottom: 4,
-  },
-  storeListRating: { 
-    fontSize: 11, 
-    color: theme.colors.gold 
-  },
-});
+const makeStyles = (colors: ReturnType<typeof useAppTheme>) =>
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    center: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      padding: 24,
+    },
+    map: {
+      flex: 1,
+    },
+    loadingText: {
+      color: colors.textSecondary,
+      marginTop: 12,
+      fontSize: 14,
+    },
+    errorEmoji: {
+      fontSize: 48,
+      marginBottom: 16,
+    },
+    errorText: {
+      color: colors.textSecondary,
+      textAlign: "center",
+      marginBottom: 20,
+      fontSize: 14,
+    },
+    retryButton: {
+      backgroundColor: colors.gold10,
+      borderWidth: 1,
+      borderColor: colors.gold,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    retryText: {
+      color: colors.gold,
+      fontWeight: "600",
+    },
+    header: {
+      position: "absolute",
+      top: 60,
+      left: 20,
+      right: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      padding: 14,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.gold20,
+    },
+    headline: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    count: {
+      fontSize: 13,
+      color: colors.gold,
+    },
+    radiusContainer: {
+      position: "absolute",
+      top: 120,
+      left: 20,
+      right: 20,
+      flexDirection: "row",
+      gap: 8,
+      justifyContent: "center",
+    },
+    radiusPill: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.gold20,
+    },
+    radiusPillActive: {
+      backgroundColor: colors.gold,
+      borderColor: colors.gold,
+    },
+    radiusText: {
+      color: colors.textSecondary,
+      fontSize: 13,
+      fontWeight: "600",
+    },
+    radiusTextActive: {
+      color: colors.white,
+    },
+    storeCard: {
+      position: "absolute",
+      bottom: 20,
+      left: 20,
+      right: 20,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.gold20,
+      gap: 12,
+    },
+    storeInfo: {
+      flex: 1,
+    },
+    storeHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 4,
+    },
+    storeName: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: colors.text,
+      flex: 1,
+    },
+    openBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 10,
+    },
+    openText: {
+      fontSize: 11,
+      fontWeight: "600",
+    },
+    storeAddress: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    storeRating: {
+      fontSize: 12,
+      color: colors.gold,
+    },
+    directionsButton: {
+      backgroundColor: colors.gold,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 12,
+    },
+    directionsText: {
+      color: colors.white,
+      fontWeight: "bold",
+      fontSize: 14,
+    },
+    storeList: {
+      position: "absolute",
+      bottom: 20,
+      left: 0,
+      right: 0,
+    },
+    storeListContent: {
+      paddingHorizontal: 20,
+      gap: 10,
+    },
+    storeListItem: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      width: 180,
+      borderWidth: 1,
+      borderColor: colors.gold15,
+    },
+    storeListName: {
+      fontSize: 13,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 4,
+    },
+    storeListAddress: {
+      fontSize: 11,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    storeListRating: {
+      fontSize: 11,
+      color: colors.gold,
+    },
+  });

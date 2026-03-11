@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { theme } from "../theme";
+import { AppTheme, useAppTheme } from "../theme";
 
 interface Props {
     message: string;
@@ -7,6 +7,9 @@ interface Props {
 }
 
 export const ErrorMessage = ({ message, onRetry }: Props) => {
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
+
     return (
         <View style={styles.container}>
       {/* Contenu erreur */}
@@ -19,19 +22,19 @@ export const ErrorMessage = ({ message, onRetry }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppTheme) => StyleSheet.create({
   // Layout
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   emoji: { fontSize: 48, marginBottom: 16 },
   message: {
     fontSize: 16,
-    color: theme.colors.textDim,
+    color: colors.textDim,
     textAlign: "center",
     lineHeight: 24,
     marginBottom: 24,
@@ -39,13 +42,13 @@ const styles = StyleSheet.create({
 
   // Action
   button: {
-    backgroundColor: theme.colors.primaryAction,
+    backgroundColor: colors.primaryAction,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
   },
   buttonText: { 
-    color: theme.colors.white, 
+    color: colors.white, 
     fontWeight: "600", 
     fontSize: 15 
 },

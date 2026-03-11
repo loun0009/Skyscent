@@ -1,27 +1,27 @@
-import { View, Text, Image, StyleSheet, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated } from "react-native";
 import { WeatherData } from "../types";
 import { useEffect, useRef } from "react";
-import { theme } from "../theme";
+import { AppTheme, useAppTheme } from "../theme";
 
 interface   Props {
     weather: WeatherData;
 }
 
-const getWeatherBackground = (condition: string) => {
+const getWeatherBackground = (condition: string, colors: AppTheme) => {
     switch (condition.toLowerCase()) {
         case "snow": 
-      return theme.colors.weatherSnow;
+      return colors.weatherSnow;
         case "rain":
         case "drizzle": 
-      return theme.colors.weatherRain;
+      return colors.weatherRain;
         case "thunderstorm": 
-      return theme.colors.weatherStorm;
+      return colors.weatherStorm;
         case "clouds": 
-      return theme.colors.weatherClouds;
+      return colors.weatherClouds;
         case "clear": 
-      return theme.colors.weatherClear;
+      return colors.weatherClear;
         default: 
-      return theme.colors.weatherDefault;
+      return colors.weatherDefault;
     }
 };
 
@@ -47,7 +47,9 @@ const getWeatherEmoji = (condition: string): string => {
 };
 
 export const WeatherCard = ({ weather }: Props) => {
-  const bgColor = getWeatherBackground(weather.condition);
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
+  const bgColor = getWeatherBackground(weather.condition, colors);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -130,14 +132,14 @@ export const WeatherCard = ({ weather }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppTheme) => StyleSheet.create({
   // Carte
   card: {
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
+    borderRadius: 24,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: theme.colors.gold20,
+    borderColor: colors.gold20,
   },
   topRow: {
     flexDirection: "row",
@@ -147,11 +149,11 @@ const styles = StyleSheet.create({
   city: {
     fontSize: 26,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   description: {
     fontSize: 14,
-    color: theme.colors.gold,
+    color: colors.gold5,
     textTransform: "capitalize",
     marginTop: 4,
   },
@@ -161,14 +163,14 @@ const styles = StyleSheet.create({
   temp: {
     fontSize: 80,
     fontWeight: "bold",
-    color: theme.colors.textPrimary,
-    marginVertical: theme.spacing.sm,
+    color: colors.text,
+    marginVertical: 8,
     letterSpacing: -2,
   },
   divider: {
     height: 1,
-    backgroundColor: theme.colors.gold30,
-    marginVertical: theme.spacing.md,
+    backgroundColor: colors.gold30,
+    marginVertical: 12,
   },
 
   // Détails
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   detailItem: { flex: 1, alignItems: "center" },
   detailLabel: {
     fontSize: 11,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -188,11 +190,11 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 14,
     fontWeight: "600",
-    color: theme.colors.textPrimary,
+    color: colors.text,
   },
   detailDivider: {
     width: 1,
     height: 30,
-    backgroundColor: theme.colors.gold20,
+    backgroundColor: colors.gold20,
   },
 });

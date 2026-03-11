@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode 
 import { getFavorites, toggleFavorite } from "../services/favoritesService";
 import { Perfume } from "../types";
 import { fetchPerfumes } from "../services/perfumesApi";
-import perfumesData from "../data/perfumes.json";
 
 interface FavoritesContextType {
   favoriteIds: number[];

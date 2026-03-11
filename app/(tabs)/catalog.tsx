@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { usePerfumes } from "../../src/hooks/usePerfumes";
 import { useFavorites } from "../../src/context/FavoritesContext";
 import { Perfume } from "../../src/types";
-import { theme } from "../../src/theme";
+import { useAppTheme } from "../../src/theme";
 
 type SortOption = "name" | "brand" | "intensity";
 type GenderFilter = "tous" | "masculin" | "féminin" | "mixte";
@@ -41,55 +41,63 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "intensity", label: "Intensité" },
 ];
 
-const INTENSITY_DOT: Record<string, string> = {
-  "légère": theme.colors.intensityLightDot,
-  "modérée": theme.colors.intensityMediumDot,
-  "intense": theme.colors.intensityStrongDot,
-};
+// ← fonction car elle dépend des couleurs du thème
+const getIntensityDot = (colors: ReturnType<typeof useAppTheme>): Record<string, string> => ({
+  "légère": colors.intensityLightDot,
+  "modérée": colors.intensityMediumDot,
+  "intense": colors.intensityStrongDot,
+});
 
+// ← reçoit styles et colors en props car défini en dehors du composant
 const PerfumeGridCard = ({
   perfume,
   onPress,
   isFavorite,
   onToggleFavorite,
+  styles,
+  colors,
 }: {
   perfume: Perfume;
   onPress: (p: Perfume) => void;
   isFavorite: boolean;
   onToggleFavorite: (id: number) => void;
-}) => (
-  // Carte unitaire de la grille catalogue
-  <TouchableOpacity
-    style={styles.gridCard}
-    onPress={() => onPress(perfume)}
-    activeOpacity={0.8}
-  >
-    <View style={styles.gridImageContainer}>
-      <Image
-        source={{ uri: perfume.image_url }}
-        style={styles.gridImage}
-        resizeMode="contain"
-      />
-      <TouchableOpacity
-        style={styles.gridHeart}
-        onPress={() => onToggleFavorite(perfume.id)}
-      >
-        <Text style={styles.gridHeartText}>{isFavorite ? "❤️" : "🤍"}</Text>
-      </TouchableOpacity>
-    </View>
+  styles: ReturnType<typeof makeStyles>;
+  colors: ReturnType<typeof useAppTheme>;
+}) => {
+  const intensityDot = getIntensityDot(colors);
+  return (
+    <TouchableOpacity
+      style={styles.gridCard}
+      onPress={() => onPress(perfume)}
+      activeOpacity={0.8}
+    >
+      <View style={styles.gridImageContainer}>
+        <Image
+          source={{ uri: perfume.image_url || undefined }}
+          style={styles.gridImage}
+          resizeMode="contain"
+        />
+        <TouchableOpacity
+          style={styles.gridHeart}
+          onPress={() => onToggleFavorite(perfume.id)}
+        >
+          <Text style={styles.gridHeartText}>{isFavorite ? "❤️" : "🤍"}</Text>
+        </TouchableOpacity>
+      </View>
 
-    <View style={styles.gridContent}>
-      <Text style={styles.gridName} numberOfLines={1}>{perfume.name}</Text>
-      <Text style={styles.gridBrand} numberOfLines={1}>{perfume.brand}</Text>
-      <View style={styles.gridFooter}>
-        <View style={styles.gridDot}>
-          <View style={[styles.dot, { backgroundColor: INTENSITY_DOT[perfume.intensity] }]} />
-          <Text style={styles.gridIntensity}>{perfume.intensity}</Text>
+      <View style={styles.gridContent}>
+        <Text style={styles.gridName} numberOfLines={1}>{perfume.name}</Text>
+        <Text style={styles.gridBrand} numberOfLines={1}>{perfume.brand}</Text>
+        <View style={styles.gridFooter}>
+          <View style={styles.gridDot}>
+            <View style={[styles.dot, { backgroundColor: intensityDot[perfume.intensity] }]} />
+            <Text style={styles.gridIntensity}>{perfume.intensity}</Text>
+          </View>
         </View>
       </View>
-    </View>
-  </TouchableOpacity>
-);
+    </TouchableOpacity>
+  );
+};
 
 export default function CatalogScreen() {
   const router = useRouter();
@@ -102,6 +110,9 @@ export default function CatalogScreen() {
   const [intensity, setIntensity] = useState<IntensityFilter>("tous");
   const [season, setSeason] = useState<SeasonFilter>("tous");
   const [showFilters, setShowFilters] = useState(false);
+
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
 
   const activeFilterCount = [
     gender !== "tous",
@@ -125,7 +136,6 @@ export default function CatalogScreen() {
     if (intensity !== "tous") result = result.filter((p) => p.intensity === intensity);
     if (season !== "tous") result = result.filter((p) => p.season.includes(season));
 
-    // Tri
     result.sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "brand") return a.brand.localeCompare(b.brand);
@@ -150,7 +160,7 @@ export default function CatalogScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.gold} />
+        <ActivityIndicator size="large" color={colors.gold} />
       </View>
     );
   }
@@ -171,7 +181,7 @@ export default function CatalogScreen() {
         <TextInput
           style={styles.searchInput}
           placeholder="Rechercher un parfum ou une marque..."
-          placeholderTextColor={theme.colors.textMuted}
+          placeholderTextColor={colors.textMuted}
           value={search}
           onChangeText={setSearch}
           autoCorrect={false}
@@ -227,6 +237,8 @@ export default function CatalogScreen() {
             onPress={handlePress}
             isFavorite={isFavorite(item.id)}
             onToggleFavorite={toggle}
+            styles={styles}
+            colors={colors}
           />
         )}
         ListEmptyComponent={
@@ -318,278 +330,266 @@ export default function CatalogScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  // Layout
-  wrapper: { 
-    flex: 1, 
-    backgroundColor: theme.colors.background 
-  },
-  center: { 
-    flex: 1, 
-    justifyContent: "center", 
-    alignItems: "center", 
-    backgroundColor: theme.colors.background 
-  },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 12,
-  },
-  headline: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
-    color: theme.colors.textPrimary 
-  },
-  counter: { 
-    fontSize: 13, 
-    color: theme.colors.gold, 
-    fontWeight: "600" 
-  },
-
-  // Recherche
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: theme.colors.card,
-    marginHorizontal: 20,
-    borderRadius: theme.radius.md,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-    gap: 10,
-  },
-  searchIcon: { 
-    fontSize: 16 
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: theme.colors.textPrimary,
-  },
-  searchClear: { 
-    fontSize: 14, 
-    color: theme.colors.textMuted 
-  },
-
-  // Contrôles
-  controlsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingRight: 20,
-    marginBottom: 12,
-    gap: 8,
-  },
-  sortRow: { 
-    paddingLeft: 20, 
-    gap: 8 
-  },
-  sortPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 20,
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-  },
-  sortPillActive: {
-    backgroundColor: theme.colors.background,
-    borderColor: theme.colors.gold,
-  },
-  sortText: { 
-    fontSize: 12, 
-    color: theme.colors.textSecondary, 
-    fontWeight: "600" 
-  },
-  sortTextActive: { 
-    color: theme.colors.gold 
-  },
-  filterButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 20,
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-  },
-  filterButtonActive: {
-    backgroundColor: theme.colors.gold,
-    borderColor: theme.colors.gold,
-  },
-  filterButtonText: { 
-    fontSize: 14, 
-    color: theme.colors.gold 
-  },
-
-  // Grille
-  listContent: { 
-    paddingHorizontal: 12, 
-    paddingBottom: 40 
-  },
-  row: { 
-    justifyContent: "space-between", 
-    paddingHorizontal: 8 
-  },
-  gridCard: {
-    width: "48%",
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    marginBottom: 12,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-  },
-  gridImageContainer: {
-    width: "100%",
-    height: 150,
-    backgroundColor: theme.colors.white,
-    position: "relative",
-  },
-  gridImage: { 
-    width: "100%", 
-    height: 150 
-  },
-  gridHeart: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: theme.colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  gridHeartText: { 
-    fontSize: 14 
-  },
-  gridContent: { 
-    padding: 10 
-  },
-  gridName: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: theme.colors.textPrimary,
-    marginBottom: 2,
-  },
-  gridBrand: { 
-    fontSize: 11, 
-    color: theme.colors.gold, 
-    marginBottom: 6 
-  },
-  gridFooter: { 
-    flexDirection: "row", 
-    alignItems: "center" 
-  },
-  gridDot: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    gap: 4 
-  },
-  dot: { 
-    width: 6, 
-    height: 6, 
-    borderRadius: 3 
-  },
-  gridIntensity: { 
-    fontSize: 10, 
-    color: theme.colors.textSecondary 
-  },
-
-  // État vide
-  empty: { 
-    alignItems: "center", 
-    marginTop: 60 
-  },
-  emptyEmoji: { 
-    fontSize: 48, 
-    marginBottom: 12 
-  },
-  emptyText: { 
-    fontSize: 15, 
-    color: theme.colors.textSecondary 
-  },
-
-  // Modal filtres
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    justifyContent: "flex-end",
-  },
-  modalContainer: {
-    backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.radius.xl,
-    borderTopRightRadius: theme.radius.xl,
-    padding: 24,
-    paddingBottom: 40,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: theme.colors.textPrimary,
-  },
-  resetText: { 
-    fontSize: 13, 
-    color: theme.colors.error, 
-    fontWeight: "600" 
-  },
-  filterLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: theme.colors.gold,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 10,
-    marginTop: 16,
-  },
-  pillsRow: { 
-    flexDirection: "row", 
-    flexWrap: "wrap", 
-    gap: 8 
-  },
-  pill: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.gold,
-  },
-  pillActive: {
-    backgroundColor: theme.colors.background,
-    borderColor: theme.colors.gold,
-  },
-  pillText: { 
-    fontSize: 13, 
-    color: theme.colors.textSecondary, 
-    fontWeight: "500" 
-  },
-  pillTextActive: { 
-    color: theme.colors.gold, 
-    fontWeight: "600" 
-  },
-  applyButton: {
-    backgroundColor: theme.colors.gold,
-    padding: 16,
-    borderRadius: theme.radius.md,
-    alignItems: "center",
-    marginTop: 24,
-  },
-  applyText: { 
-    color: theme.colors.background, 
-    fontWeight: "bold", 
-    fontSize: 15 
-  },
-});
+const makeStyles = (colors: ReturnType<typeof useAppTheme>) =>
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    center: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      paddingTop: 60,
+      paddingBottom: 12,
+    },
+    headline: {
+      fontSize: 28,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    counter: {
+      fontSize: 13,
+      color: colors.gold,
+      fontWeight: "600",
+    },
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      marginHorizontal: 20,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.gold30,
+      gap: 10,
+    },
+    searchIcon: {
+      fontSize: 16,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+    },
+    searchClear: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    controlsRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingRight: 20,
+      marginBottom: 12,
+      gap: 8,
+    },
+    sortRow: {
+      paddingLeft: 20,
+      gap: 8,
+    },
+    sortPill: {
+      paddingHorizontal: 14,
+      paddingVertical: 7,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
+    },
+    sortPillActive: {
+      backgroundColor: colors.gold15,
+      borderColor: colors.gold,
+    },
+    sortText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: "600",
+    },
+    sortTextActive: {
+      color: colors.gold,
+    },
+    filterButton: {
+      paddingHorizontal: 14,
+      paddingVertical: 7,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
+    },
+    filterButtonActive: {
+      backgroundColor: colors.gold,
+      borderColor: colors.gold,
+    },
+    filterButtonText: {
+      fontSize: 14,
+      color: colors.gold,
+    },
+    listContent: {
+      paddingHorizontal: 12,
+      paddingBottom: 40,
+    },
+    row: {
+      justifyContent: "space-between",
+      paddingHorizontal: 8,
+    },
+    gridCard: {
+      width: "48%",
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      marginBottom: 12,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
+    },
+    gridImageContainer: {
+      width: "100%",
+      height: 150,
+      backgroundColor: colors.white,
+      position: "relative",
+    },
+    gridImage: {
+      width: "100%",
+      height: 150,
+    },
+    gridHeart: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: colors.background,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    gridHeartText: {
+      fontSize: 14,
+    },
+    gridContent: {
+      padding: 10,
+    },
+    gridName: {
+      fontSize: 13,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 2,
+    },
+    gridBrand: {
+      fontSize: 11,
+      color: colors.gold,
+      marginBottom: 6,
+    },
+    gridFooter: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    gridDot: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+    },
+    gridIntensity: {
+      fontSize: 10,
+      color: colors.textSecondary,
+    },
+    empty: {
+      alignItems: "center",
+      marginTop: 60,
+    },
+    emptyEmoji: {
+      fontSize: 48,
+      marginBottom: 12,
+    },
+    emptyText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: colors.overlay,
+      justifyContent: "flex-end",
+    },
+    modalContainer: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      padding: 24,
+      paddingBottom: 40,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 24,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    resetText: {
+      fontSize: 13,
+      color: colors.error,
+      fontWeight: "600",
+    },
+    filterLabel: {
+      fontSize: 12,
+      fontWeight: "bold",
+      color: colors.gold,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 10,
+      marginTop: 16,
+    },
+    pillsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+    },
+    pill: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.surfaceLight,
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
+    },
+    pillActive: {
+      backgroundColor: colors.gold15,
+      borderColor: colors.gold,
+    },
+    pillText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      fontWeight: "500",
+    },
+    pillTextActive: {
+      color: colors.gold,
+      fontWeight: "600",
+    },
+    applyButton: {
+      backgroundColor: colors.gold,
+      padding: 16,
+      borderRadius: 12,
+      alignItems: "center",
+      marginTop: 24,
+    },
+    applyText: {
+      color: colors.white,
+      fontWeight: "bold",
+      fontSize: 15,
+    },
+  });

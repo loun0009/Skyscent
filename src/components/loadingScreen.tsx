@@ -1,6 +1,6 @@
 import { View, Text, ActivityIndicator, StyleSheet, Animated } from "react-native";
 import { useEffect, useRef } from "react";
-import { theme } from "../theme";
+import { AppTheme, useAppTheme } from "../theme";
 
 
 interface Props {
@@ -8,6 +8,8 @@ interface Props {
 }
 
 export const LoadingScreen = ({ message = "Chargement..." }: Props) => {
+  const colors = useAppTheme();
+  const styles = makeStyles(colors);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -21,18 +23,18 @@ export const LoadingScreen = ({ message = "Chargement..." }: Props) => {
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Text style={styles.emoji}>🌸</Text>
-      <ActivityIndicator size="large" color={theme.colors.gold} style={styles.spinner} />
+      <ActivityIndicator size="large" color={colors.gold} style={styles.spinner} />
       <Text style={styles.message}>{message}</Text>
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppTheme) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
   },
   emoji: { 
     fontSize: 48, 
@@ -42,6 +44,6 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   message: { fontSize: 15, 
-    color: theme.colors.textSecondary 
+    color: colors.textSecondary 
   },
 });
