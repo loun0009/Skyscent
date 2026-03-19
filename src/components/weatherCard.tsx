@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Animated } from "react-native";
 import { WeatherData } from "../types";
 import { useEffect, useRef } from "react";
 import { AppTheme, useAppTheme } from "../theme";
+import { useTheme } from "../context/ThemeContext";
 
 interface   Props {
     weather: WeatherData;
@@ -23,6 +24,40 @@ const getWeatherBackground = (condition: string, colors: AppTheme) => {
         default: 
       return colors.weatherDefault;
     }
+};
+
+const getWeatherAppearance = (
+  condition: string,
+  colors: AppTheme,
+  isDark: boolean,
+) => {
+  const backgroundColor = getWeatherBackground(condition, colors);
+
+  if (isDark) {
+    return {
+      backgroundColor,
+      titleColor: colors.text,
+      accentColor: colors.goldLight,
+      labelColor: colors.textSecondary,
+      valueColor: colors.text,
+      dividerColor: colors.gold30,
+      borderColor: colors.gold20,
+    };
+  }
+
+  const useLightText = ["rain", "drizzle", "thunderstorm", "clear"].includes(
+    condition.toLowerCase(),
+  );
+
+  return {
+    backgroundColor,
+    titleColor: useLightText ? colors.white : colors.text,
+    accentColor: useLightText ? colors.white : colors.goldDark,
+    labelColor: useLightText ? "#FFFFFFCC" : colors.textSecondary,
+    valueColor: useLightText ? colors.white : colors.text,
+    dividerColor: useLightText ? "#FFFFFF33" : colors.gold30,
+    borderColor: useLightText ? "#FFFFFF26" : colors.cardBorder,
+  };
 };
 
 const getWeatherEmoji = (condition: string): string => {
@@ -48,8 +83,9 @@ const getWeatherEmoji = (condition: string): string => {
 
 export const WeatherCard = ({ weather }: Props) => {
   const colors = useAppTheme();
-  const styles = makeStyles(colors);
-  const bgColor = getWeatherBackground(weather.condition, colors);
+  const { isDark } = useTheme();
+  const appearance = getWeatherAppearance(weather.condition, colors, isDark);
+  const styles = makeStyles(colors, appearance);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -90,7 +126,6 @@ export const WeatherCard = ({ weather }: Props) => {
     <Animated.View
       style={[
         styles.card,
-        { backgroundColor: bgColor },
         { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
@@ -132,14 +167,15 @@ export const WeatherCard = ({ weather }: Props) => {
   );
 };
 
-const makeStyles = (colors: AppTheme) => StyleSheet.create({
+const makeStyles = (colors: AppTheme, appearance: ReturnType<typeof getWeatherAppearance>) => StyleSheet.create({
   // Carte
   card: {
     borderRadius: 24,
     padding: 16,
     marginBottom: 16,
+    backgroundColor: appearance.backgroundColor,
     borderWidth: 1,
-    borderColor: colors.gold20,
+    borderColor: appearance.borderColor,
   },
   topRow: {
     flexDirection: "row",
@@ -149,11 +185,11 @@ const makeStyles = (colors: AppTheme) => StyleSheet.create({
   city: {
     fontSize: 26,
     fontWeight: "bold",
-    color: colors.text,
+    color: appearance.titleColor,
   },
   description: {
     fontSize: 14,
-    color: colors.gold5,
+    color: appearance.accentColor,
     textTransform: "capitalize",
     marginTop: 4,
   },
@@ -163,13 +199,13 @@ const makeStyles = (colors: AppTheme) => StyleSheet.create({
   temp: {
     fontSize: 80,
     fontWeight: "bold",
-    color: colors.text,
+    color: appearance.valueColor,
     marginVertical: 8,
     letterSpacing: -2,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.gold30,
+    backgroundColor: appearance.dividerColor,
     marginVertical: 12,
   },
 
@@ -182,7 +218,7 @@ const makeStyles = (colors: AppTheme) => StyleSheet.create({
   detailItem: { flex: 1, alignItems: "center" },
   detailLabel: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: appearance.labelColor,
     marginBottom: 4,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -190,11 +226,11 @@ const makeStyles = (colors: AppTheme) => StyleSheet.create({
   detailValue: {
     fontSize: 14,
     fontWeight: "600",
-    color: colors.text,
+    color: appearance.valueColor,
   },
   detailDivider: {
     width: 1,
     height: 30,
-    backgroundColor: colors.gold20,
+    backgroundColor: appearance.dividerColor,
   },
 });
