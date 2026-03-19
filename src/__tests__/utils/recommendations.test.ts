@@ -89,9 +89,50 @@ describe("getRecommendations", () => {
     expect(results).toEqual([]);
   });
 
-  it("trie par score décroissant", () => {
+  it("ne retourne que les parfums au score maximal", () => {
     const results = getRecommendations(coldWeather, mockPerfumes);
-    // Le premier résultat doit avoir le meilleur score
-    expect(results[0].id).toBe(1);
+    expect(results.map((perfume) => perfume.id).sort()).toEqual([1, 3]);
+  });
+
+  it("mélange les parfums ex aequo sur le meilleur score", () => {
+    const tiedPerfumes: Perfume[] = [
+      {
+        id: 10,
+        name: "Alpha",
+        brand: "Test",
+        description: "Premier",
+        notes: ["note"],
+        intensity: "modérée",
+        gender: "mixte",
+        season: ["autumn"],
+        temp_min: 0,
+        temp_max: 20,
+        weatherConditions: ["rain"],
+        image_url: null,
+      },
+      {
+        id: 11,
+        name: "Beta",
+        brand: "Test",
+        description: "Second",
+        notes: ["note"],
+        intensity: "modérée",
+        gender: "mixte",
+        season: ["autumn"],
+        temp_min: 0,
+        temp_max: 20,
+        weatherConditions: ["rain"],
+        image_url: null,
+      },
+    ];
+
+    const randomSpy = jest.spyOn(Math, "random").mockReturnValue(0);
+
+    const results = getRecommendations(coldWeather, tiedPerfumes);
+
+    expect(results.map((perfume) => perfume.id)).toEqual([11, 10]);
+    expect(results).toHaveLength(2);
+
+    randomSpy.mockRestore();
   });
 });

@@ -62,6 +62,33 @@ const getTodayShownIds = async (gender?: string | null): Promise<number[] | null
   return history[getTodayKey()] || null;
 };
 
+const shuffleArray = <T>(items: T[]): T[] => {
+  const shuffled = [...items];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [
+      shuffled[randomIndex],
+      shuffled[index],
+    ];
+  }
+
+  return shuffled;
+};
+
+const pickMaxScoreRandomized = <T extends { score: number }>(
+  items: T[],
+  limit = 5
+): T[] => {
+  if (items.length === 0) {
+    return [];
+  }
+
+  const maxScore = Math.max(...items.map((item) => item.score));
+
+  return shuffleArray(items.filter((item) => item.score === maxScore)).slice(0, limit);
+};
+
 const scorePerfumes = (
   weather: WeatherData,
   perfumes: Perfume[]
@@ -98,11 +125,9 @@ export const getRecommendations = (
   weather: WeatherData,
   perfumes: Perfume[]
 ): Perfume[] => {
-
-  return scorePerfumes(weather, perfumes)
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
+  return pickMaxScoreRandomized(
+    scorePerfumes(weather, perfumes).filter(({ score }) => score > 0)
+  )
     .map(({ perfume }) => perfume);
 };
 
@@ -129,11 +154,8 @@ export const getDailyRecommendations = async (
   const freshPerfumes = scored.filter(({ perfume }) => !recentIds.has(perfume.id));
   const seenPerfumes = scored.filter(({ perfume }) => recentIds.has(perfume.id));
 
-   const combined = [
-    ...freshPerfumes.sort((a, b) => b.score - a.score),
-    ...seenPerfumes.sort((a, b) => b.score - a.score),
-  ];
-  const recommendations = combined.slice(0, 5).map(({ perfume }) => perfume);
+  const prioritizedPool = freshPerfumes.length > 0 ? freshPerfumes : seenPerfumes;
+  const recommendations = pickMaxScoreRandomized(prioritizedPool).map(({ perfume }) => perfume);
   await saveHistory(recommendations.map((p) => p.id), userGender);
   return recommendations;
 };
