@@ -189,7 +189,7 @@ const makeStyles = (colors: any) =>
   headline: { 
     fontSize: 22, 
     fontWeight: "bold", 
-    color: colors.textPrimary 
+    color: colors.text 
   },
   sectionTitle: {
     fontSize: 12,
@@ -258,7 +258,7 @@ const makeStyles = (colors: any) =>
   statValue: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textPrimary,
+    color: colors.text,
   },
   statSubtitle: {
     fontSize: 12,
@@ -278,7 +278,7 @@ const makeStyles = (colors: any) =>
   emptyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 8,
   },
   emptySubtitle: {

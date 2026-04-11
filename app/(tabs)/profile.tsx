@@ -352,7 +352,7 @@ export default function ProfileScreen() {
         <View style={styles.shortcutsRow}>
           <TouchableOpacity style={styles.shortcutCard} onPress={() => router.push("/history")}>
             <Text style={styles.shortcutEmoji}>📖</Text>
-            <Text style={styles.shortcutLabel}>Historique</Text>
+            <Text style={styles.shortcutLabel} numberOfLines={1} adjustsFontSizeToFit>Historique</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.shortcutCard} onPress={() => router.push("/favorites")}>
             <Text style={styles.shortcutEmoji}>❤️</Text>
@@ -364,7 +364,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.shortcutCard} onPress={() => router.push("/settings")}>
             <Text style={styles.shortcutEmoji}>⚙️</Text>
-            <Text style={styles.shortcutLabel}>Paramètres</Text>
+            <Text style={styles.shortcutLabel} numberOfLines={1} adjustsFontSizeToFit>Paramètres</Text>
           </TouchableOpacity>
         </View>
 

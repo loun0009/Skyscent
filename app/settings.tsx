@@ -70,7 +70,7 @@ const makeStyles = (colors: any) =>
   headline: { 
     fontSize: 22, 
     fontWeight: "bold", 
-    color: colors.textPrimary, 
+    color: colors.text, 
 },
 
   // Carte info
@@ -82,7 +82,7 @@ const makeStyles = (colors: any) =>
   infoTitle: { 
     fontSize: 15, 
     fontWeight: "bold", 
-    color: colors.textPrimary, 
+    color: colors.text, 
     marginBottom: 8 
 },
   infoText: { 
