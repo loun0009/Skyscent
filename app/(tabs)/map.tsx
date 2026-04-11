@@ -9,8 +9,8 @@ import { useTheme } from "../../src/context/ThemeContext";
 const RADIUS_OPTIONS = [
   { label: "500m", value: 500 },
   { label: "1km", value: 1000 },
-  { label: "3km", value: 3000 },
   { label: "5km", value: 5000 },
+  { label: "10km", value: 10000 },
 ];
 
 const openInMaps = (store: PerfumeStore) => {
