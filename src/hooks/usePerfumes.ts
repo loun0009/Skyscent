@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Perfume, WeatherData } from "../types";
 import { fetchPerfumes } from "../services/perfumesApi";
-import { getDailyRecommendations } from "../utils/recommendations";
+import { getDailyRecommendations, UserPreferences } from "../utils/recommendations";
 import { useAuth } from "../context/AuthContext";
+
 interface UsePerfumesReturn {
-    perfumes: Perfume[];
-    recommendations: Perfume[];
-    loading: boolean;
-    error: string | null;
+  perfumes: Perfume[];
+  recommendations: Perfume[];
+  loading: boolean;
+  error: string | null;
 }
 
 export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
@@ -23,9 +24,30 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
 
   useEffect(() => {
     if (!weather || perfumes.length === 0) return;
-    const mappedGender = user?.gender === "homme" ? "masculin" : user?.gender === "femme" ? "féminin" : null;
-    getDailyRecommendations(weather, perfumes, mappedGender).then(setRecommendations);
-  }, [weather, perfumes, user?.gender]);
+
+    // Mapping genre (base → parfum)
+    const mappedGender =
+      user?.gender === "homme"
+        ? "masculin"
+        : user?.gender === "femme"
+        ? "féminin"
+        : null;
+
+    // Toutes les préférences utilisateur transmises à l'algo
+    const prefs: UserPreferences = {
+      gender: mappedGender,
+      preferredIntensity: user?.preferred_intensity ?? null,
+      preferredSeason: user?.preferred_season ?? null,
+    };
+
+    getDailyRecommendations(weather, perfumes, prefs).then(setRecommendations);
+  }, [
+    weather,
+    perfumes,
+    user?.gender,
+    user?.preferred_intensity,
+    user?.preferred_season,
+  ]);
 
   const loadPerfumes = async () => {
     try {
@@ -33,7 +55,7 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
       setError(null);
       const data = await fetchPerfumes();
       setPerfumes(data);
-    } catch (e) {
+    } catch {
       setError("Impossible de charger les parfums.");
     } finally {
       setLoading(false);
@@ -41,4 +63,4 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
   };
 
   return { perfumes, recommendations, loading, error };
-}
+};
