@@ -10,9 +10,18 @@ interface Props {
   onToggleFavorite?: (id: number) => void;
   index?: number;
   rating?: { average: number; count: number };
+  isInCollection?: boolean;
 }
 
-export const PerfumeCard = ({ perfume, onPress, isFavorite = false, onToggleFavorite, index = 0, rating }: Props) => {
+export const PerfumeCard = ({
+  perfume,
+  onPress,
+  isFavorite = false,
+  onToggleFavorite,
+  index = 0,
+  rating,
+  isInCollection = false,
+}: Props) => {
   const colors = useAppTheme();
   const styles = makeStyles(colors);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -49,14 +58,28 @@ export const PerfumeCard = ({ perfume, onPress, isFavorite = false, onToggleFavo
 
   return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateX: slideAnim }] }}>
-      <TouchableOpacity style={styles.card} onPress={() => onPress(perfume)} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.card, isInCollection && styles.cardCollection]}
+        onPress={() => onPress(perfume)}
+        activeOpacity={0.8}
+      >
         <View style={styles.imageContainer}>
           <Image
-            source={imageError || !perfume.image_url ? require("../../assets/adaptative_logo.png") : { uri: perfume.image_url }}
+            source={
+              imageError || !perfume.image_url
+                ? require("../../assets/adaptative_logo.png")
+                : { uri: perfume.image_url }
+            }
             style={styles.image}
             resizeMode="contain"
             onError={() => setImageError(true)}
           />
+          {/* Badge collection sur l'image */}
+          {isInCollection && (
+            <View style={styles.collectionBadge}>
+              <Text style={styles.collectionBadgeText}>💎</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -74,22 +97,36 @@ export const PerfumeCard = ({ perfume, onPress, isFavorite = false, onToggleFavo
                 <Text style={styles.badgeText}>{perfume.intensity}</Text>
               </View>
               {onToggleFavorite && (
-                <TouchableOpacity style={styles.heartButton} onPress={() => onToggleFavorite(perfume.id)}>
+                <TouchableOpacity
+                  style={styles.heartButton}
+                  onPress={() => onToggleFavorite(perfume.id)}
+                >
                   <Text style={styles.heart}>{isFavorite ? "❤️" : "🤍"}</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
 
-          <Text style={styles.description} numberOfLines={2}>{perfume.description}</Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {perfume.description}
+          </Text>
 
-          <View style={styles.notesRow}>
-            {perfume.notes.slice(0, 3).map((note) => (
-              <View key={note} style={styles.noteTag}>
-                <Text style={styles.noteText}>{note}</Text>
-              </View>
-            ))}
-            {perfume.notes.length > 3 && <Text style={styles.moreNotes}>+{perfume.notes.length - 3}</Text>}
+          <View style={styles.footer}>
+            <View style={styles.notesRow}>
+              {perfume.notes.slice(0, 3).map((note) => (
+                <View key={note} style={styles.noteTag}>
+                  <Text style={styles.noteText}>{note}</Text>
+                </View>
+              ))}
+              {perfume.notes.length > 3 && (
+                <Text style={styles.moreNotes}>+{perfume.notes.length - 3}</Text>
+              )}
+            </View>
+
+            {/* Label collection en bas de carte */}
+            {isInCollection && (
+              <Text style={styles.collectionLabel}>Dans ma collection</Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -100,7 +137,7 @@ export const PerfumeCard = ({ perfume, onPress, isFavorite = false, onToggleFavo
 const makeStyles = (colors: AppTheme) =>
   StyleSheet.create({
     card: {
-      backgroundColor: colors.card,
+      backgroundColor: colors.surface,
       borderRadius: 16,
       marginBottom: 12,
       flexDirection: "row",
@@ -109,17 +146,40 @@ const makeStyles = (colors: AppTheme) =>
       borderColor: colors.gold15,
       minHeight: 120,
     },
+    // Bordure dorée plus marquée pour les parfums de la collection
+    cardCollection: {
+      borderColor: colors.gold,
+      borderWidth: 1.5,
+    },
     imageContainer: {
       width: 120,
       height: 120,
       backgroundColor: colors.white,
       justifyContent: "center",
       alignItems: "center",
+      position: "relative",
     },
     image: {
       width: 110,
       height: 110,
       resizeMode: "contain",
+    },
+    // Badge 💎 en haut à gauche de l'image
+    collectionBadge: {
+      position: "absolute",
+      top: 6,
+      left: 6,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: colors.surface,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.gold30,
+    },
+    collectionBadgeText: {
+      fontSize: 12,
     },
     content: {
       flex: 1,
@@ -180,10 +240,16 @@ const makeStyles = (colors: AppTheme) =>
       lineHeight: 18,
       marginVertical: 6,
     },
+    footer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
     notesRow: {
       flexDirection: "row",
       flexWrap: "wrap",
       gap: 4,
+      flex: 1,
     },
     noteTag: {
       backgroundColor: colors.gold10,
@@ -206,5 +272,12 @@ const makeStyles = (colors: AppTheme) =>
       fontSize: 11,
       color: colors.gold,
       marginTop: 2,
+    },
+    // Label "Dans ma collection" en bas à droite
+    collectionLabel: {
+      fontSize: 10,
+      color: colors.gold,
+      fontWeight: "600",
+      marginLeft: 8,
     },
   });

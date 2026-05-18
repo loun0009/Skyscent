@@ -6,13 +6,14 @@ import { supabase } from "../services/supabaseClient";
 const HISTORY_KEY = "recommendations_history";
 const MAX_HISTORY_DAYS = 7;
 const RECOMMENDATIONS_LIMIT = 15;
-const SCORE_THRESHOLD_RATIO = 0.65; // On garde les parfums à >= 65% du score max ( + de diversité)
+const SCORE_THRESHOLD_RATIO = 0.65;
 
 // ─── Profil utilisateur transmis à l'algo ─────────────────────
 export interface UserPreferences {
   gender: "masculin" | "féminin" | null;
   preferredIntensity: "légère" | "modérée" | "intense" | null;
   preferredSeason: Season | null;
+  collectionIds: number[]; 
 }
 
 // ─── Utilitaires de date ───────────────────────────────────────
@@ -28,7 +29,7 @@ const getTodayKey = (): string => new Date().toISOString().split("T")[0];
 const getHistoryKey = (gender?: string | null): string =>
   `${HISTORY_KEY}_${gender ?? "all"}`;
 
-// ─── AsyncStorage (recommandations du jour) ────────────────────
+// ─── AsyncStorage ──────────────────────────────────────────────
 const loadHistory = async (
   gender?: string | null
 ): Promise<Record<string, number[]>> => {
@@ -75,18 +76,15 @@ const getRecentlyShownIds = async (
   return ids;
 };
 
-// ─── Historique Supabase (parfums portés récemment) ───────────
+// ─── Historique Supabase ───────────────────────────────────────
 const getRecentlyWornIds = async (): Promise<Set<number>> => {
   try {
     const since = new Date();
-    since.setDate(since.getDate() - 7); // 7 derniers jours
-
+    since.setDate(since.getDate() - 7);
     const { data } = await supabase
       .from("perfume_history")
-      .select("perfume_id, worn_at")
-      .gte("worn_at", since.toISOString())
-      .order("worn_at", { ascending: false });
-
+      .select("perfume_id")
+      .gte("worn_at", since.toISOString());
     return new Set((data ?? []).map((e) => e.perfume_id));
   } catch {
     return new Set();
@@ -104,6 +102,13 @@ const shuffleArray = <T>(items: T[]): T[] => {
 };
 
 // ─── Scoring ──────────────────────────────────────────────────
+//
+//  Météo           : temp plage (+3), temp proche (+1), saison (+2), condition (+1)
+//  Préférences     : intensité (+2), saison préférée (+2)
+//  Collection      : dans ma collection (+2)
+//  Pénalités       : porté récemment (-2)
+//  Score max théorique : 12
+//
 const scorePerfumes = (
   weather: WeatherData,
   perfumes: Perfume[],
@@ -112,19 +117,18 @@ const scorePerfumes = (
 ): { perfume: Perfume; score: number }[] => {
   const weatherSeason = getSeason(weather.temperature);
   const condition = weather.condition.toLowerCase();
+  const collectionSet = new Set(prefs.collectionIds);
 
   return perfumes.map((perfume) => {
     let score = 0;
 
-    // ── Critères météo ─────────────────────────────────────────
-    // Température dans la plage idéale (+3)
+    // ── Météo ──────────────────────────────────────────────────
     if (
       weather.temperature >= perfume.temp_min &&
       weather.temperature <= perfume.temp_max
     ) {
       score += 3;
     } else {
-      // Pénalité partielle si proche de la plage (+1)
       const delta = Math.min(
         Math.abs(weather.temperature - perfume.temp_min),
         Math.abs(weather.temperature - perfume.temp_max)
@@ -132,12 +136,10 @@ const scorePerfumes = (
       if (delta <= 3) score += 1;
     }
 
-    // Saison météo correspondante (+2)
     if (Array.isArray(perfume.season) && perfume.season.includes(weatherSeason)) {
       score += 2;
     }
 
-    // Condition météo correspondante (+1)
     if (
       Array.isArray(perfume.weatherConditions) &&
       perfume.weatherConditions.includes(condition)
@@ -146,13 +148,10 @@ const scorePerfumes = (
     }
 
     // ── Préférences utilisateur ────────────────────────────────
-    // Intensité préférée (+2)
     if (prefs.preferredIntensity && perfume.intensity === prefs.preferredIntensity) {
       score += 2;
     }
 
-    // Saison préférée correspond à la saison météo actuelle (+2)
-    // (on booste seulement si la saison préférée matche aussi la météo)
     if (
       prefs.preferredSeason &&
       prefs.preferredSeason === weatherSeason &&
@@ -162,8 +161,14 @@ const scorePerfumes = (
       score += 2;
     }
 
+    // ── Collection (+2) ────────────────────────────────────────
+    // Un parfum que l'utilisateur possède et qui est adapté
+    // à la météo remonte naturellement en tête
+    if (collectionSet.has(perfume.id)) {
+      score += 2;
+    }
+
     // ── Pénalités ──────────────────────────────────────────────
-    // Porté dans les 7 derniers jours (-2)
     if (recentlyWornIds.has(perfume.id)) {
       score -= 2;
     }
@@ -173,8 +178,6 @@ const scorePerfumes = (
 };
 
 // ─── Sélection par seuil relatif ──────────────────────────────
-// Au lieu de ne garder que le score max, on garde tout ce qui est
-// >= SCORE_THRESHOLD_RATIO du score max puis on mélange
 const pickByThreshold = <T extends { score: number }>(
   items: T[],
   limit: number
@@ -182,8 +185,7 @@ const pickByThreshold = <T extends { score: number }>(
   if (items.length === 0) return [];
   const maxScore = Math.max(...items.map((i) => i.score));
   const threshold = maxScore * SCORE_THRESHOLD_RATIO;
-  const eligible = items.filter((i) => i.score >= threshold);
-  return shuffleArray(eligible).slice(0, limit);
+  return shuffleArray(items.filter((i) => i.score >= threshold)).slice(0, limit);
 };
 
 // ─── Export principal ──────────────────────────────────────────
@@ -195,12 +197,10 @@ export const getDailyRecommendations = async (
 
   // 1. Filtrer par genre
   const genderFiltered = prefs.gender
-    ? perfumes.filter(
-        (p) => p.gender === prefs.gender || p.gender === "mixte"
-      )
+    ? perfumes.filter((p) => p.gender === prefs.gender || p.gender === "mixte")
     : perfumes;
 
-  // 2. Si les recommandations du jour existent déjà → les retourner
+  // 2. Recommandations du jour déjà calculées → les retourner
   const todayIds = await getTodayShownIds(prefs.gender);
   if (todayIds && todayIds.length > 0) {
     const todayPerfumes = todayIds
@@ -209,28 +209,26 @@ export const getDailyRecommendations = async (
     if (todayPerfumes.length > 0) return todayPerfumes;
   }
 
-  // 3. Charger l'historique de port (Supabase) et les recommandations récentes
+  // 3. Charger les historiques en parallèle
   const [recentlyWornIds, recentlyShownIds] = await Promise.all([
     getRecentlyWornIds(),
     getRecentlyShownIds(prefs.gender),
   ]);
 
-  // 4. Scorer tous les parfums
+  // 4. Scorer
   const scored = scorePerfumes(weather, genderFiltered, prefs, recentlyWornIds)
-    .filter(({ score }) => score > 0); // Exclure les scores nuls ou négatifs
+    .filter(({ score }) => score > 0);
 
-  // 5. Séparer les parfums frais (non montrés récemment) des autres
+  // 5. Prioriser les parfums non montrés récemment
   const fresh = scored.filter(({ perfume }) => !recentlyShownIds.has(perfume.id));
   const seen = scored.filter(({ perfume }) => recentlyShownIds.has(perfume.id));
-
-  // 6. Prioriser les parfums frais, compléter avec les vus si besoin
   const pool = fresh.length >= 5 ? fresh : [...fresh, ...seen];
 
-  // 7. Sélectionner par seuil relatif
+  // 6. Sélectionner par seuil
   const recommendations = pickByThreshold(pool, RECOMMENDATIONS_LIMIT)
     .map(({ perfume }) => perfume);
 
-  // 8. Sauvegarder pour le reste de la journée
+  // 7. Sauvegarder pour la journée
   await saveHistory(recommendations.map((p) => p.id), prefs.gender);
 
   return recommendations;

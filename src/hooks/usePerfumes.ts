@@ -3,6 +3,7 @@ import { Perfume, WeatherData } from "../types";
 import { fetchPerfumes } from "../services/perfumesApi";
 import { getDailyRecommendations, UserPreferences } from "../utils/recommendations";
 import { useAuth } from "../context/AuthContext";
+import { useCollection } from "../context/CollectionContext";
 
 interface UsePerfumesReturn {
   perfumes: Perfume[];
@@ -17,6 +18,7 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { collection } = useCollection();
 
   useEffect(() => {
     loadPerfumes();
@@ -25,7 +27,6 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
   useEffect(() => {
     if (!weather || perfumes.length === 0) return;
 
-    // Mapping genre (base → parfum)
     const mappedGender =
       user?.gender === "homme"
         ? "masculin"
@@ -33,11 +34,11 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
         ? "féminin"
         : null;
 
-    // Toutes les préférences utilisateur transmises à l'algo
     const prefs: UserPreferences = {
       gender: mappedGender,
       preferredIntensity: user?.preferred_intensity ?? null,
       preferredSeason: user?.preferred_season ?? null,
+      collectionIds: collection.map((p) => p.id), // ← IDs de la collection
     };
 
     getDailyRecommendations(weather, perfumes, prefs).then(setRecommendations);
@@ -47,6 +48,7 @@ export const usePerfumes = (weather: WeatherData | null): UsePerfumesReturn => {
     user?.gender,
     user?.preferred_intensity,
     user?.preferred_season,
+    collection, // ← re-calcul si la collection change
   ]);
 
   const loadPerfumes = async () => {
