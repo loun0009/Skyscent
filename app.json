@@ -26,7 +26,10 @@
         "foregroundImage": "./assets/adaptative_logo.png",
         "backgroundColor": "#6b4eff"
       },
-      "permissions": ["RECEIVE_BOOT_COMPLETED"],
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "RECEIVE_BOOT_COMPLETED"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -44,6 +47,18 @@
           "sound": []
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "089671fb-e8fb-4e3b-85a7-2fb1f60e1778"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/089671fb-e8fb-4e3b-85a7-2fb1f60e1778"
+    }
   }
 }
