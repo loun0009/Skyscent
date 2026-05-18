@@ -12,14 +12,10 @@ export const darkTheme = {
   // Textes
   text: '#ffffff',
   textSecondary: '#a0a0a0',
-  textTertiary: '#606060',
-  textDim: '#505050',
   textMuted: '#808080',
 
   // Or / Accent
   gold: '#c9a84c',
-  goldLight: '#e8c97a',
-  goldDark: '#8a6e2a',
   gold05: '#C9A84C0D',
   gold10: '#C9A84C1A',
   gold15: '#C9A84C26',
@@ -33,8 +29,6 @@ export const darkTheme = {
   error20: '#E74C3C33',
   success: '#2ecc71',
   success20: '#2ECC7133',
-  warning: '#f39c12',
-  info: '#3498db',
 
   // Météo
   weatherSnow: '#b0c4de',
@@ -69,7 +63,6 @@ export const darkTheme = {
   placeholder: '#505050',
   inputBorder: '#333333',
   borderSubtle: '#2a2a2a',
-  primaryAction: '#c9a84c',
 
   // Overlay / Gradients
   overlay: '#00000080',
@@ -91,14 +84,10 @@ export const lightTheme = {
   // Textes
   text: '#1a1a1a',
   textSecondary: '#555555',
-  textTertiary: '#888888',
-  textDim: '#aaaaaa',
   textMuted: '#777777',
 
   // Or / Accent
   gold: '#b8903a',
-  goldLight: '#d4a845',
-  goldDark: '#7a5e1a',
   gold05: '#B8903A0D',
   gold10: '#B8903A1A',
   gold15: '#B8903A26',
@@ -112,8 +101,6 @@ export const lightTheme = {
   error20: '#C0392B33',
   success: '#27ae60',
   success20: '#27AE6033',
-  warning: '#d68910',
-  info: '#2980b9',
 
   // Météo
   weatherSnow: '#6ea3c8',
@@ -148,7 +135,6 @@ export const lightTheme = {
   placeholder: '#aaaaaa',
   inputBorder: '#d0cdc6',
   borderSubtle: '#e8e5de',
-  primaryAction: '#b8903a',
 
   // Overlay / Gradients
   overlay: '#0000004D',
