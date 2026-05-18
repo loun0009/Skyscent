@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Animated, Image } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Animated, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useWeather } from "../../src/hooks/useWeather";
 import { usePerfumes } from "../../src/hooks/usePerfumes";
@@ -10,11 +10,10 @@ import { LoadingScreen } from "../../src/components/loadingScreen";
 import { ErrorMessage } from "../../src/components/errorBoundary";
 import { Perfume } from "../../src/types";
 import { useFavorites } from "../../src/context/FavoritesContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useAppTheme } from "../../src/theme";
 import { useAuth } from "../../src/context/AuthContext";
 import { useCollection } from "../../src/context/CollectionContext";
-
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -22,10 +21,11 @@ export default function HomeScreen() {
   const { recommendations, perfumes, loading: perfumesLoading } = usePerfumes(weather);
   const { filters, setGender, setIntensity, setBrand, resetFilters, applyFilters, activeCount } = useFilters();
   const { isFavorite, toggle } = useFavorites();
-  const { user } = useAuth();  
+  const { user } = useAuth();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-20)).current;
-  const { collection } = useCollection();
+  const { collection, isInCollection } = useCollection();
+
   const colors = useAppTheme();
   const styles = makeStyles(colors);
 
@@ -33,18 +33,17 @@ export default function HomeScreen() {
 
   const filteredRecommendations = applyFilters(recommendations);
 
+  // ── Trier : parfums de la collection en premier ─────────────
+  const sortedRecommendations = useMemo(() => {
+    const inCollection = filteredRecommendations.filter((p) => isInCollection(p.id));
+    const notInCollection = filteredRecommendations.filter((p) => !isInCollection(p.id));
+    return [...inCollection, ...notInCollection];
+  }, [filteredRecommendations, collection]);
+
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -52,17 +51,11 @@ export default function HomeScreen() {
     router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } });
   };
 
-  if (weatherLoading) {
-    return <LoadingScreen message="Détection de votre position..." />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} onRetry={refresh} />;
-  }
+  if (weatherLoading) return <LoadingScreen message="Détection de votre position..." />;
+  if (error) return <ErrorMessage message={error} onRetry={refresh} />;
 
   return (
     <View style={styles.wrapper}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
@@ -70,10 +63,7 @@ export default function HomeScreen() {
       >
         {/* Header animé */}
         <Animated.View
-          style={[
-            styles.header,
-            { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-          ]}
+          style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
         >
           <View>
             <Text style={styles.greeting}>
@@ -99,8 +89,8 @@ export default function HomeScreen() {
           onReset={resetFilters}
         />
 
+        {/* Collection utilisateur */}
         {hasCollection && (
-          // Collection utilisateur
           <View style={styles.collectionSection}>
             <Text style={styles.collectionTitle}>Ma Collection 💎</Text>
             <ScrollView
@@ -112,15 +102,17 @@ export default function HomeScreen() {
                 <TouchableOpacity
                   key={perfume.id}
                   style={styles.collectionItem}
-                  onPress={() => router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } })}
+                  onPress={() =>
+                    router.push({ pathname: "/perfume/[id]", params: { id: perfume.id } })
+                  }
                   activeOpacity={0.8}
                 >
                   <View style={styles.collectionItemImage}>
                     <Image
-                        source={{ uri: perfume.image_url || undefined }}
-                        style={{ width: 70, height: 70 }}
-                        resizeMode="contain"
-                      />
+                      source={{ uri: perfume.image_url || undefined }}
+                      style={{ width: 70, height: 70 }}
+                      resizeMode="contain"
+                    />
                   </View>
                   <Text style={styles.collectionItemName} numberOfLines={1}>
                     {perfume.name}
@@ -134,17 +126,23 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>
-          {filteredRecommendations.length > 0
-            ? `${filteredRecommendations.length} parfum${filteredRecommendations.length > 1 ? "s" : ""} recommandé${filteredRecommendations.length > 1 ? "s" : ""} ✨`
-            : "Aucun parfum pour ces filtres 😔"}
-        </Text>
+        {/* Titre section recommandations */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
+            {sortedRecommendations.length > 0
+              ? `${sortedRecommendations.length} parfum${sortedRecommendations.length > 1 ? "s" : ""} recommandé${sortedRecommendations.length > 1 ? "s" : ""} ✨`
+              : "Aucun parfum pour ces filtres 😔"}
+          </Text>
+          {/* Indicateur si des parfums de la collection sont dans les résultats */}
+          {sortedRecommendations.some((p) => isInCollection(p.id)) && (
+            <Text style={styles.collectionHint}>💎 = dans ta collection</Text>
+          )}
+        </View>
 
         {perfumesLoading ? (
           <LoadingScreen message="Analyse des parfums..." />
         ) : (
-          // Liste recommandée
-          filteredRecommendations.map((perfume, index) => (
+          sortedRecommendations.map((perfume, index) => (
             <PerfumeCard
               key={perfume.id}
               perfume={perfume}
@@ -152,6 +150,7 @@ export default function HomeScreen() {
               isFavorite={isFavorite(perfume.id)}
               onToggleFavorite={toggle}
               index={index}
+              isInCollection={isInCollection(perfume.id)}
             />
           ))
         )}
@@ -159,10 +158,7 @@ export default function HomeScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>
             Mis à jour à{" "}
-            {new Date().toLocaleTimeString("fr-FR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
           </Text>
         </View>
       </ScrollView>
@@ -170,116 +166,117 @@ export default function HomeScreen() {
   );
 }
 
-
-
 const makeStyles = (colors: ReturnType<typeof useAppTheme>) =>
   StyleSheet.create({
-    // Layout
-    wrapper: { 
-      flex: 1, 
-      backgroundColor: colors.background 
+    wrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
     },
-    container: { 
-      flex: 1 
+    container: {
+      flex: 1,
     },
-    content: { 
-      padding: 20, 
-      paddingTop: 60, 
-      paddingBottom: 40 
+    content: {
+      padding: 20,
+      paddingTop: 60,
+      paddingBottom: 40,
     },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  greeting: { 
-    fontSize: 14, 
-    color: colors.gold, 
-    marginBottom: 4 
-  },
-  headline: { 
-    fontSize: 26, 
-    fontWeight: "bold", 
-    color: colors.text 
-  },
-  refreshButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.gold20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  refreshText: { 
-    fontSize: 20, 
-    color: colors.gold 
-  },
-
-  // Recommandations & footer
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.text,
-    marginBottom: 16,
-  },
-  footer: {
-    alignItems: "center",
-    marginTop: 24,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.gold10,
-  },
-  footerText: { 
-    fontSize: 12, 
-    color: colors.textMuted 
-  },
-
-  // Collection
-  collectionSection: {
-    marginBottom: 24,
-  },
-  collectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.text,
-    marginBottom: 12,
-  },
-  collectionScroll: {
-    gap: 12,
-    paddingRight: 4,
-  },
-  collectionItem: {
-    width: 90,
-    alignItems: "center",
-    gap: 4,
-  },
-  collectionItemImage: {
-    width: 90,
-    height: 90,
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.gold20,
-    overflow: "hidden",
-  },
-  collectionItemName: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: colors.text,
-    textAlign: "center",
-    width: 90,
-  },
-  collectionItemBrand: {
-    fontSize: 10,
-    color: colors.gold,
-    textAlign: "center",
-    width: 90,
-  },
-});
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 24,
+    },
+    greeting: {
+      fontSize: 14,
+      color: colors.gold,
+      marginBottom: 4,
+    },
+    headline: {
+      fontSize: 26,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    refreshButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.gold20,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    refreshText: {
+      fontSize: 20,
+      color: colors.gold,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    collectionHint: {
+      fontSize: 11,
+      color: colors.gold,
+      fontWeight: "500",
+    },
+    footer: {
+      alignItems: "center",
+      marginTop: 24,
+      paddingTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.gold10,
+    },
+    footerText: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    collectionSection: {
+      marginBottom: 24,
+    },
+    collectionTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 12,
+    },
+    collectionScroll: {
+      gap: 12,
+      paddingRight: 4,
+    },
+    collectionItem: {
+      width: 90,
+      alignItems: "center",
+      gap: 4,
+    },
+    collectionItemImage: {
+      width: 90,
+      height: 90,
+      backgroundColor: colors.white,
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.gold20,
+      overflow: "hidden",
+    },
+    collectionItemName: {
+      fontSize: 11,
+      fontWeight: "bold",
+      color: colors.text,
+      textAlign: "center",
+      width: 90,
+    },
+    collectionItemBrand: {
+      fontSize: 10,
+      color: colors.gold,
+      textAlign: "center",
+      width: 90,
+    },
+  });
