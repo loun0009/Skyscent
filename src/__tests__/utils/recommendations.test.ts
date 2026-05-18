@@ -1,5 +1,19 @@
-import { getRecommendations } from "../../utils/recommendations";
+import { expect,it,describe, jest } from "@jest/globals";
+import { getDailyRecommendations } from "../../utils/recommendations";
 import { Perfume, WeatherData } from "../../types";
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn(() => null),
+  setItem: jest.fn(() => null),
+}));
+
+jest.mock("../../services/supabaseClient", () => ({
+  supabase: {
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({ gte: jest.fn(() => ({ data: [] }) ) }) ),
+    })),
+  },
+}));
 
 const mockPerfumes: Perfume[] = [
   {
@@ -66,35 +80,40 @@ const hotWeather: WeatherData = {
   icon: "01d",
 };
 
-describe("getRecommendations", () => {
-  it("retourne au maximum 5 parfums", () => {
-    const results = getRecommendations(coldWeather, mockPerfumes);
-    expect(results.length).toBeLessThanOrEqual(5);
+describe("getDailyRecommendations", () => {
+  it("retourne au maximum 15 parfums", async () => {
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
+    const results = await getDailyRecommendations(coldWeather, mockPerfumes, prefs);
+    expect(results.length).toBeLessThanOrEqual(15);
   });
 
-  it("recommande les parfums adaptés au froid et à la pluie", () => {
-    const results = getRecommendations(coldWeather, mockPerfumes);
+  it("recommande les parfums adaptés au froid et à la pluie", async () => {
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
+    const results = await getDailyRecommendations(coldWeather, mockPerfumes, prefs);
     const ids = results.map((p) => p.id);
     expect(ids).toContain(1); // Santal 33 : temp OK + saison OK + weather OK
   });
 
-  it("recommande les parfums adaptés à la chaleur", () => {
-    const results = getRecommendations(hotWeather, mockPerfumes);
+  it("recommande les parfums adaptés à la chaleur", async () => {
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
+    const results = await getDailyRecommendations(hotWeather, mockPerfumes, prefs);
     const ids = results.map((p) => p.id);
     expect(ids).toContain(2); // Neroli : temp OK + saison OK + weather OK
   });
 
-  it("retourne un tableau vide si aucun parfum ne correspond", () => {
-    const results = getRecommendations(coldWeather, []);
+  it("retourne un tableau vide si aucun parfum ne correspond", async () => {
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
+    const results = await getDailyRecommendations(coldWeather, [], prefs);
     expect(results).toEqual([]);
   });
 
-  it("ne retourne que les parfums au score maximal", () => {
-    const results = getRecommendations(coldWeather, mockPerfumes);
+  it("ne retourne que les parfums au score maximal", async () => {
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
+    const results = await getDailyRecommendations(coldWeather, mockPerfumes, prefs);
     expect(results.map((perfume) => perfume.id).sort()).toEqual([1, 3]);
   });
 
-  it("mélange les parfums ex aequo sur le meilleur score", () => {
+  it("mélange les parfums ex aequo sur le meilleur score", async () => {
     const tiedPerfumes: Perfume[] = [
       {
         id: 10,
@@ -126,9 +145,10 @@ describe("getRecommendations", () => {
       },
     ];
 
+    const prefs = { gender: null, preferredIntensity: null, preferredSeason: null, collectionIds: [] };
     const randomSpy = jest.spyOn(Math, "random").mockReturnValue(0);
 
-    const results = getRecommendations(coldWeather, tiedPerfumes);
+    const results = await getDailyRecommendations(coldWeather, tiedPerfumes, prefs);
 
     expect(results.map((perfume) => perfume.id)).toEqual([11, 10]);
     expect(results).toHaveLength(2);
