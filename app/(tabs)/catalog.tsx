@@ -99,6 +99,38 @@ const PerfumeGridCard = ({
   );
 };
 
+const ThemePerfumeCard = ({
+  perfume,
+  onPress,
+  styles,
+}: {
+  perfume: Perfume;
+  onPress: (p: Perfume) => void;
+  styles: ReturnType<typeof makeStyles>;
+}) => (
+  <TouchableOpacity
+    style={styles.themeCard}
+    onPress={() => onPress(perfume)}
+    activeOpacity={0.85}
+  >
+    <View style={styles.themeImageWrapper}>
+      <Image
+        source={
+          perfume.image_url
+            ? { uri: perfume.image_url }
+            : require("../../assets/adaptative_logo.png")
+        }
+        style={styles.themeImage}
+        resizeMode="cover"
+      />
+    </View>
+    <View style={styles.themeCardText}>
+      <Text style={styles.themeName} numberOfLines={1}>{perfume.name}</Text>
+      <Text style={styles.themeBrand} numberOfLines={1}>{perfume.brand}</Text>
+    </View>
+  </TouchableOpacity>
+);
+
 export default function CatalogScreen() {
   const router = useRouter();
   const { perfumes, loading } = usePerfumes(null);
@@ -157,6 +189,88 @@ export default function CatalogScreen() {
     setSeason("tous");
   };
 
+  const canShowThemeSections = !search.trim() && activeFilterCount === 0;
+
+  const themeSections = useMemo(
+    () => {
+      const usedIds = new Set<number>();
+
+      const sectionTemplates = [
+        {
+          key: "favorite",
+          title: "Mes favoris",
+          subtitle: "Ceux que tu aimes déjà",
+          items: perfumes.filter((p) => isFavorite(p.id)),
+        },
+        {
+          key: "ysl",
+          title: "Collection Yves Saint Laurent",
+          subtitle: "Chic et sensuel",
+          items: perfumes.filter((p) =>
+            p.brand.toLowerCase().includes("yves saint laurent") ||
+            p.brand.toLowerCase().includes("ysl")
+          ),
+        },
+        {
+          key: "creators",
+          title: "Grands créateurs",
+          subtitle: "Marques iconiques à découvrir",
+          items: perfumes.filter((p) => {
+            const brand = p.brand.toLowerCase();
+            return ["tom ford", "le labo", "dior", "chanel", "yves saint laurent", "ysl"].some((name) => brand.includes(name));
+          }),
+        },
+        {
+          key: "summer",
+          title: "Senteurs d’été",
+          subtitle: "Fraîcheur et légèreté",
+          items: perfumes.filter((p) => p.season.includes("summer")),
+        },
+        {
+          key: "light",
+          title: "Parfums légers",
+          subtitle: "Subtils et faciles à porter",
+          items: perfumes.filter((p) => p.intensity === "légère"),
+        },
+        {
+          key: "winter",
+          title: "Charmes d’hiver",
+          subtitle: "Enveloppants et chaleureux",
+          items: perfumes.filter((p) => p.season.includes("winter")),
+        },
+        {
+          key: "intense",
+          title: "Intenses à découvrir",
+          subtitle: "Puissance et caractère",
+          items: perfumes.filter((p) => p.intensity === "intense"),
+        },
+        {
+          key: "mixte",
+          title: "Essentiels unisexe",
+          subtitle: "Parfums pour tous",
+          items: perfumes.filter((p) => p.gender === "mixte"),
+        },
+      ];
+
+      const sections = sectionTemplates.reduce<typeof sectionTemplates>((acc, section) => {
+        const uniqueItems = section.items.filter((perfume) => {
+          if (usedIds.has(perfume.id)) return false;
+          usedIds.add(perfume.id);
+          return true;
+        });
+
+        if (uniqueItems.length > 0) {
+          acc.push({ ...section, items: uniqueItems });
+        }
+
+        return acc;
+      }, []);
+
+      return sections;
+    },
+    [perfumes, isFavorite]
+  );
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -167,63 +281,6 @@ export default function CatalogScreen() {
 
   return (
     <View style={styles.wrapper}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headline}>Catalogue 🌸</Text>
-        <Text style={styles.counter}>
-          {filtered.length} parfum{filtered.length > 1 ? "s" : ""}
-        </Text>
-      </View>
-
-      {/* Barre de recherche */}
-      <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher un parfum ou une marque..."
-          placeholderTextColor={colors.textMuted}
-          value={search}
-          onChangeText={setSearch}
-          autoCorrect={false}
-        />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch("")}>
-            <Text style={styles.searchClear}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Tri + ouverture des filtres */}
-      <View style={styles.controlsRow}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.sortRow}
-        >
-          {SORT_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={[styles.sortPill, sortBy === option.value && styles.sortPillActive]}
-              onPress={() => setSortBy(option.value)}
-            >
-              <Text style={[styles.sortText, sortBy === option.value && styles.sortTextActive]}>
-                {option.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <TouchableOpacity
-          style={[styles.filterButton, activeFilterCount > 0 && styles.filterButtonActive]}
-          onPress={() => setShowFilters(true)}
-        >
-          <Text style={styles.filterButtonText}>
-            🎛 {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Grille */}
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id.toString()}
@@ -231,6 +288,99 @@ export default function CatalogScreen() {
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.headline}>Catalogue 🌸</Text>
+              <Text style={styles.counter}>
+                {filtered.length} parfum{filtered.length > 1 ? "s" : ""}
+              </Text>
+            </View>
+
+            {/* Barre de recherche */}
+            <View style={styles.searchContainer}>
+              <Text style={styles.searchIcon}>🔍</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Rechercher un parfum ou une marque..."
+                placeholderTextColor={colors.textMuted}
+                value={search}
+                onChangeText={setSearch}
+                autoCorrect={false}
+              />
+              {search.length > 0 && (
+                <TouchableOpacity onPress={() => setSearch("")}>
+                  <Text style={styles.searchClear}>✕</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Tri + ouverture des filtres */}
+            <View style={styles.controlsRow}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.sortRow}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[styles.sortPill, sortBy === option.value && styles.sortPillActive]}
+                    onPress={() => setSortBy(option.value)}
+                  >
+                    <Text style={[styles.sortText, sortBy === option.value && styles.sortTextActive]}>
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <TouchableOpacity
+                style={[styles.filterButton, activeFilterCount > 0 && styles.filterButtonActive]}
+                onPress={() => setShowFilters(true)}
+              >
+                <Text style={styles.filterButtonText}>
+                  🎛 {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {canShowThemeSections && themeSections.length > 0 && (
+              <>
+                <View style={styles.themeSections}>
+                  {themeSections.map((section) => (
+                    <View key={section.key} style={styles.themeSection}>
+                      <View style={styles.themeHeader}>
+                        <View>
+                          <Text style={styles.themeTitle}>{section.title}</Text>
+                          <Text style={styles.themeSubtitle}>{section.subtitle}</Text>
+                        </View>
+                      </View>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.themeCardsRow}
+                      >
+                        {section.items.slice(0, 5).map((perfume) => (
+                          <ThemePerfumeCard
+                            key={perfume.id}
+                            perfume={perfume}
+                            styles={styles}
+                            onPress={handlePress}
+                          />
+                        ))}
+                      </ScrollView>
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.sectionDivider}>
+                  <Text style={styles.sectionDividerText}>Catalogue complet</Text>
+                </View>
+              </>
+            )}
+          </>
+        }
         renderItem={({ item }) => (
           <PerfumeGridCard
             perfume={item}
@@ -539,6 +689,83 @@ const makeStyles = (colors: ReturnType<typeof useAppTheme>) =>
       fontSize: 20,
       fontWeight: "bold",
       color: colors.text,
+    },
+    themeSections: {
+      paddingTop: 8,
+      paddingBottom: 16,
+    },
+    themeSection: {
+      marginBottom: 16,
+    },
+    themeHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12,
+      paddingHorizontal: 20,
+    },
+    themeTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    themeSubtitle: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginTop: 4,
+    },
+    themeCardsRow: {
+      paddingLeft: 20,
+      paddingRight: 20,
+    },
+    sectionDivider: {
+      marginTop: 18,
+      marginBottom: 10,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: colors.cardBorder,
+    },
+    sectionDividerText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.text,
+    },
+    themeCard: {
+      width: 170,
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.cardBorder,
+      marginRight: 12,
+    },
+    themeImageWrapper: {
+      width: "100%",
+      height: 120,
+      backgroundColor: colors.surfaceLight,
+      overflow: "hidden",
+    },
+    themeImage: {
+      width: "100%",
+      height: "100%",
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+    },
+    themeCardText: {
+      padding: 12,
+    },
+    themeName: {
+      fontSize: 13,
+      fontWeight: "bold",
+      color: colors.text,
+    },
+    themeBrand: {
+      fontSize: 11,
+      color: colors.gold,
+      marginTop: 4,
     },
     resetText: {
       fontSize: 13,
