@@ -41,32 +41,15 @@ const getWeatherAppearance = (
 ) => {
   const accentColor = getWeatherBackground(condition, colors);
 
-  if (isDark) {
-    return {
-      backgroundColor: colors.surface,
-      borderColor: accentColor,
-      titleColor: colors.text,
-      accentColor: accentColor,
-      labelColor: colors.textSecondary,
-      valueColor: colors.text,
-      dividerColor: colors.borderSubtle,
-      tempColor: accentColor,
-    };
-  }
-
-  const useLightText = ["rain", "drizzle", "thunderstorm", "clear"].includes(
-    condition.toLowerCase(),
-  );
-
   return {
-    backgroundColor: accentColor,
-    borderColor: useLightText ? "#FFFFFF26" : colors.cardBorder,
-    titleColor: useLightText ? colors.white : colors.black,
-    accentColor: useLightText ? colors.white : colors.text,
-    labelColor: useLightText ? "#FFFFFFCC" : colors.text,
-    valueColor: useLightText ? colors.white : colors.text,
-    dividerColor: useLightText ? "#FFFFFF33" : colors.textSecondary,
-    tempColor: useLightText ? colors.white : colors.black,
+    backgroundColor: colors.surface,
+    borderColor: accentColor,
+    titleColor: colors.text,
+    accentColor: accentColor,
+    labelColor: colors.textSecondary,
+    valueColor: colors.text,
+    dividerColor: colors.borderSubtle,
+    tempColor: accentColor,
   };
 };
 
